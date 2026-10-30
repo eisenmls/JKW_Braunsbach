@@ -8,6 +8,7 @@ Android app for the Jüdischer Kulturweg Braunsbach. The app is a plain website 
 |---|---|
 | `www/index.html` | The whole website: text, styling and script |
 | `www/images/`, `www/audio/` | Media used by the website |
+| `www/fonts/` | Fonts, stored here so the app works offline |
 | `android/` | Android project, normally no need to touch it |
 | `capacitor.config.json` | App name, app ID and website folder |
 

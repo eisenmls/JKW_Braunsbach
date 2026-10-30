@@ -1,812 +1,1635 @@
 <!DOCTYPE html>
-<html>
+<html lang="de">
 <head>
-  <meta charset="utf-8">
-  <title>Kulturweg</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8">
+<title>Kulturweg Braunsbach</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#141b22">
 <style>
+/* Design idea "Stein und Glas": limestone pages, dark glass and the sloped
+   break edge of the Braunsbacher Denksteine (Station 8). The blue comes from
+   the menora on the trail signs. */
+
+@font-face {
+  font-family: "Frank Ruhl Libre";
+  src: url(fonts/frank-ruhl-libre-latin.woff2) format("woff2");
+  font-weight: 300 900;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2190-2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Frank Ruhl Libre";
+  src: url(fonts/frank-ruhl-libre-hebrew.woff2) format("woff2");
+  font-weight: 300 900;
+  font-display: swap;
+  unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F;
+}
+@font-face {
+  font-family: "Source Sans 3";
+  src: url(fonts/source-sans-3-latin.woff2) format("woff2");
+  font-weight: 200 900;
+  font-display: swap;
+}
+
+:root {
+  --stone: #ece6da;
+  --stone-2: #e1d9ca;
+  --paper: #f7f3ea;
+  --ink: #22201b;
+  --ink-2: #5b5448;
+  --line: #cfc6b5;
+  --blue: #1c6ca8;
+  --blue-2: #3d97cf;
+  --night: #141b22;
+  --night-2: #1e2831;
+  --on-night: #efeadf;
+  --on-night-2: #b3b8b6;
+  --glass: rgba(20, 27, 34, .76);
+  --serif: "Frank Ruhl Libre", Georgia, serif;
+  --sans: "Source Sans 3", Roboto, "Segoe UI", sans-serif;
+  --gutter: 1.05rem;
+  --measure: 35rem;
+  --stele: polygon(0 15%, 100% 0, 100% 100%, 0 100%);
+  --top: max(env(safe-area-inset-top, 0px), var(--safe-area-inset-top, 0px));
+  --bottom: max(env(safe-area-inset-bottom, 0px), var(--safe-area-inset-bottom, 0px));
+  --rail: 3rem;
+  --schrift: 1;
+  --unten: 0px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --stone: #1e2630;
+    --stone-2: #29333e;
+    --paper: #232c37;
+    --ink: #ebe6da;
+    --ink-2: #aeb3b1;
+    --line: #333d48;
+    --blue: #6ab8ec;
+  }
+}
+
+* { box-sizing: border-box; }
+
+html {
+  font-size: calc(19px * var(--schrift));
+  -webkit-text-size-adjust: 100%;
+  background: var(--night);
+}
+
 body {
   margin: 0;
-  font-size: 28px;
-  font-family: Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+  background: var(--stone);
+  color: var(--ink);
+  font-family: var(--sans);
+  line-height: 1.58;
   overflow-wrap: break-word;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.header {
-  background-color: #f1f1f1;
-  padding: 30px;
-  text-align: center;
+body.mit-player { --unten: 6.2rem; }
+
+a { color: inherit; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+img { display: block; max-width: 100%; height: auto; }
+
+:focus-visible { outline: 3px solid var(--blue-2); outline-offset: 2px; }
+
+.tabcontent { display: none; }
+.tabcontent.offen { display: block; animation: auftauchen .4s ease-out; }
+
+@keyframes auftauchen {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
 }
+
+/* Station rail: the old tab bar, now the trail itself */
 
 #navbar {
-  overflow: hidden;
-  background-color: #1e37b6;
-  z-index: 10;
-}
-
-#navbar a {
-  float: left;
-  display: block;
-  color: #f2f2f2;
-  text-align: center;
-  padding: 14px 16px;
-  text-decoration: none;
-  font-size: 17px;
-}
-
-#navbar a:hover {
-  background-color: #45e28b;
-  color: black;
-  width: 10%;
-}
-
-#navbar a.active {
-  background-color: #04AA6D;
-  color: white;
-  width: 5%;
-}
-
-.content {
-  padding: 16px;
-}
-
-.sticky {
   position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: none;
+  align-items: center;
+  gap: .15rem;
+  padding: var(--top) .3rem 0;
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  backdrop-filter: blur(14px) saturate(1.2);
+  color: var(--on-night);
+}
+
+body.in-station #navbar { display: flex; }
+
+#navbar .heim {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: var(--rail);
+}
+
+#navbar .heim svg { width: 1.45rem; height: 1.45rem; }
+
+.rail {
+  flex: 1;
+  display: flex;
+  min-width: 0;
+  height: var(--rail);
+  align-items: center;
+  background: linear-gradient(var(--blue-2), var(--blue-2)) center / 100% 1px no-repeat;
+}
+
+.rail .tablink {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  height: var(--rail);
+  display: grid;
+  place-items: center;
+  color: var(--on-night);
+  font-size: .78rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-decoration: none;
+}
+
+.rail .tablink span {
+  display: grid;
+  place-items: center;
+  width: 1.32rem;
+  height: 1.55rem;
+  background: var(--night-2);
+  clip-path: var(--stele);
+  padding-top: .12rem;
+}
+
+.rail .tablink.gesehen span { background: #2d4a60; }
+
+.rail .tablink.active span {
+  background: var(--on-night);
+  color: var(--night);
+  width: 1.6rem;
+  height: 2rem;
+  font-size: 1rem;
+  font-family: var(--serif);
+}
+
+#fortschritt {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: var(--blue-2);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+/* Start page */
+
+.intro {
+  position: relative;
+  overflow: hidden;
+  padding: calc(var(--top) + 1.5rem) 1.3rem 5.2rem;
+  background: var(--night);
+  color: var(--on-night);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 3.2rem), 0 100%);
+}
+
+.intro::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url(images/sonstiges-02-karte.svg) 100% 0 / 190% auto no-repeat;
+  filter: grayscale(1) invert(1) contrast(1.6) brightness(.8);
+  mix-blend-mode: screen;
+  opacity: .16;
+}
+
+@media (prefers-color-scheme: dark) {
+  .intro::before { filter: none; opacity: .13; }
+}
+
+.intro > * { position: relative; }
+
+.marke { width: 3.1rem; height: 3.1rem; color: var(--blue-2); margin-bottom: 1.5rem; }
+
+.intro h1 {
+  margin: 0;
+  font-size: .86rem;
+  font-weight: 600;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--on-night-2);
+}
+
+.intro .claim {
+  margin: .5rem 0 1.5rem;
+  font-family: var(--serif);
+  font-size: clamp(2.5rem, 12.6vw, 3.6rem);
+  font-weight: 400;
+  line-height: 1.04;
+  letter-spacing: -.015em;
+  hyphens: manual;
+}
+
+.fakten {
+  display: grid;
+  grid-template-columns: repeat(4, auto);
+  justify-content: space-between;
+  gap: .25rem .6rem;
+  max-width: 26rem;
+  margin: 0 0 1.6rem;
+  padding: 0;
+  list-style: none;
+  color: var(--on-night-2);
+  font-size: .76rem;
+  line-height: 1.25;
+}
+
+.fakten b {
+  display: block;
+  color: var(--on-night);
+  font-family: var(--serif);
+  font-size: 1.4rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.los {
+  display: inline-flex;
+  align-items: center;
+  gap: .6em;
+  min-height: 3rem;
+  padding: .6rem 1.15rem;
+  background: var(--blue-2);
+  color: #08151f;
+  font-weight: 700;
+  text-decoration: none;
+  clip-path: polygon(0 .55rem, 100% 0, 100% 100%, 0 100%);
+}
+
+.karte { position: relative; margin: -2.2rem auto 0; max-width: 34rem; }
+.karte img { width: 100%; }
+
+.karte svg {
+  position: absolute;
+  inset: 0;
   width: 100%;
+  height: 100%;
 }
 
-.sticky + .content {
-  padding-top: 60px;
+.karte .weglinie {
+  fill: none;
+  stroke: var(--blue-2);
+  stroke-width: 8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-opacity: .28;
 }
 
-img {
-  max-width:100%;
+.karte .weg-kern {
+  fill: none;
+  stroke: var(--blue);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
+.offen .weg-kern {
+  stroke-dasharray: 1;
+  animation: wegzeichnen 2.6s .25s cubic-bezier(.45, .05, .35, 1) both;
+}
+
+@keyframes wegzeichnen {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+
+.karte .pfad { stroke: var(--ink); stroke-width: 1.2; }
+.karte .punkt { fill: var(--ink); }
+
+.karte a { outline: none; }
+.karte .treffer { fill: transparent; }
+.karte .stein { fill: var(--night); stroke: var(--stone); stroke-width: 1.6; }
+.karte .gesehen .stein { fill: var(--blue); }
+
+.karte text {
+  font-family: var(--serif);
+  font-size: 19px;
+  font-weight: 600;
+  text-anchor: middle;
+  fill: #f2eee4;
+}
+
+.karte .ort {
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  fill: var(--ink-2);
+}
+
+.karte .fluss { fill: #4d7588; font-style: italic; letter-spacing: .3em; font-weight: 500; font-family: var(--serif); text-transform: none; font-size: 19px; }
+
+.offen .karte a { animation: setzen .4s calc(.35s + var(--i) * .22s) both cubic-bezier(.3, 1.4, .5, 1); transform-box: fill-box; transform-origin: center; }
+
+@keyframes setzen {
+  from { opacity: 0; transform: translateY(7px) scale(.7); }
+  to { opacity: 1; transform: none; }
+}
+
+.quelle-karte {
+  margin: .4rem auto 0;
+  max-width: var(--measure);
+  padding: 0 var(--gutter);
+  color: var(--ink-2);
+  font-size: .72rem;
+  line-height: 1.35;
+}
+
+.weg {
+  max-width: var(--measure);
+  margin: 2rem auto 0;
+  padding: 0 var(--gutter);
+  list-style: none;
+  background: linear-gradient(var(--blue-2), var(--blue-2)) calc(var(--gutter) + 1.1rem) 0 / 2px 100% no-repeat;
+}
+
+.weg a {
+  display: grid;
+  grid-template-columns: 2.2rem 1fr 3.4rem;
+  align-items: center;
+  gap: .8rem;
+  padding: .55rem 0;
+  text-decoration: none;
+}
+
+.stein-nr {
+  display: grid;
+  place-items: center;
+  width: 2.2rem;
+  height: 2.75rem;
+  padding-top: .3rem;
+  background: var(--night);
+  color: var(--on-night);
+  clip-path: var(--stele);
+  font-family: var(--serif);
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+.gesehen .stein-nr { background: var(--blue); }
+
+@media (prefers-color-scheme: dark) {
+  .stein-nr { background: var(--stone-2); }
+  .gesehen .stein-nr { background: #2d5874; }
+}
+
+.weg .name {
+  font-family: var(--serif);
+  font-size: 1.12rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.weg small {
+  display: block;
+  margin-top: .12rem;
+  color: var(--ink-2);
+  font-family: var(--sans);
+  font-size: .78rem;
+  font-weight: 400;
+}
+
+.weg img {
+  width: 3.4rem;
+  height: 3.4rem;
+  object-fit: cover;
+  filter: grayscale(1) contrast(1.05);
+  clip-path: var(--stele);
+}
+
+.fuss {
+  max-width: var(--measure);
+  margin: 2.4rem auto 0;
+  padding: 1rem var(--gutter) calc(1.4rem + var(--bottom) + var(--unten));
+  border-top: 1px solid var(--line);
+  color: var(--ink-2);
+  font-size: .86rem;
+}
+
+/* Station header */
+
+.hero {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  min-height: min(68vh, 34rem);
+  padding: calc(var(--top) + var(--rail) + 1rem) 1.1rem 3.2rem;
+  overflow: hidden;
+  background: var(--night);
+  color: var(--on-night);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 2.6rem), 0 100%);
+}
+
+.hero-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+  object-position: var(--fokus, 50% 40%);
+  filter: grayscale(1) contrast(1.12) brightness(.92);
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to bottom, rgba(20, 27, 34, .45), rgba(20, 27, 34, .1) 32%, rgba(20, 27, 34, .94) 86%),
+    rgba(28, 74, 110, .3);
+}
+
+.hero h2 {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: .85rem;
+  align-items: end;
+  margin: 0;
+  width: 100%;
+  max-width: 44rem;
+  font-family: var(--serif);
+  font-weight: 400;
+}
+
+.hero .stn { display: contents; }
+
+.hero .stn i {
+  grid-column: 2;
+  grid-row: 1;
+  font-family: var(--sans);
+  font-size: .78rem;
+  font-style: normal;
+  font-weight: 600;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--on-night-2);
+}
+
+.hero .stn b {
+  grid-column: 1;
+  grid-row: 1 / 3;
+  align-self: stretch;
+  display: grid;
+  place-items: end center;
+  min-width: 4.2rem;
+  padding: 1.1rem .75rem .2rem;
+  background: rgba(239, 234, 223, .15);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  clip-path: polygon(0 1rem, 100% 0, 100% 100%, 0 100%);
+  font-size: 3.5rem;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.hero .ttl {
+  grid-column: 2;
+  grid-row: 2;
+  font-size: clamp(1.85rem, 8.6vw, 2.7rem);
+  line-height: 1.08;
+  letter-spacing: -.01em;
+  hyphens: auto;
+}
+
+.hero .ttl::first-letter { text-transform: uppercase; }
+
+.hero-denksteine { background: linear-gradient(#1a2733, var(--night) 75%); }
+.hero-denksteine svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.hero-denksteine::after { background: linear-gradient(to bottom, transparent 40%, rgba(20, 27, 34, .93) 84%); }
+
+.hero-schlicht { min-height: 0; padding-top: calc(var(--top) + var(--rail) + 2.2rem); }
+.hero-schlicht::after { display: none; }
+
+.meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  max-width: var(--measure);
+  margin: -.2rem auto .5rem;
+  padding: 0 var(--gutter);
+  color: var(--ink-2);
+  font-size: .84rem;
+}
+
+.aa {
+  flex: none;
+  min-width: 3rem;
+  min-height: 2.75rem;
+  font-family: var(--serif);
+  font-size: 1.15rem;
+  text-align: right;
+}
+
+.aa small { font-size: .75em; }
+
+.sprung {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem;
+  max-width: var(--measure);
+  margin: 0 auto .9rem;
+  padding: 0 var(--gutter);
+}
+
+.sprung button {
+  min-height: 2.5rem;
+  padding: .3rem .75rem;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  font-size: .84rem;
+  line-height: 1.2;
+}
+
+/* Reading */
+
+.seite > p, .seite > h3, .seite > h4, .seite > .tracks, .seite > .tafel,
+.seite > ol, .seite > .formel, .seite > .kicker,
+.abschnitt > p, .abschnitt > h3, .abschnitt > h4, .abschnitt > .tracks {
+  max-width: var(--measure);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--gutter);
+  padding-right: var(--gutter);
+}
+
+.seite p { margin-top: 0; margin-bottom: .85em; hyphens: auto; }
+
+.seite h3 {
+  margin-top: 2.1rem;
+  margin-bottom: .6rem;
+  scroll-margin-top: calc(var(--top) + var(--rail) + .6rem);
+  font-family: var(--serif);
+  font-size: 1.6rem;
+  font-weight: 500;
+  line-height: 1.16;
+  letter-spacing: -.005em;
+}
+
+.seite h4 {
+  margin-top: 1.6rem;
+  margin-bottom: .25rem;
+  font-family: var(--serif);
+  font-size: 1.22rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.kicker {
+  margin-top: 1.5rem;
+  margin-bottom: .1rem;
+  color: var(--blue);
+  font-size: .84rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+/* Figures */
+
+figure { margin: 1.5rem auto; }
+
+figure img { cursor: zoom-in; }
+
+figcaption {
+  max-width: var(--measure);
+  margin: .4rem auto 0;
+  padding: 0 var(--gutter);
+  color: var(--ink-2);
+  font-size: .84rem;
+  line-height: 1.35;
+}
+
+figure.breit { max-width: 44rem; }
+figure.breit img { width: 100%; }
+
+figure.hoch { max-width: var(--measure); padding: 0 var(--gutter); }
+figure.hoch img { margin: 0 auto; max-height: 78vh; width: auto; }
+figure.hoch figcaption { padding: 0; text-align: center; }
+
+figure.dok { max-width: var(--measure); padding: 0 var(--gutter); }
+figure.dok img { margin: 0 auto; border: .5rem solid var(--paper); box-shadow: 0 .1rem .5rem rgba(50, 40, 20, .28); }
+figure.dok figcaption { padding: 0; }
+
+figure.klein { max-width: 20rem; padding: 0 var(--gutter); }
+figure.klein img { margin: 0 auto; }
+figure.klein figcaption { padding: 0; text-align: center; }
+
+.tafel {
+  display: grid;
+  grid-template-columns: 3.3rem 1fr;
+  align-items: center;
+  gap: .8rem;
+  margin-top: .75rem;
+  margin-bottom: 1.1rem;
+  width: 100%;
+  text-align: left;
+}
+
+.tafel img { width: 3.3rem; height: 4.2rem; object-fit: cover; object-position: top; border: 1px solid var(--line); }
+.tafel b { display: block; line-height: 1.2; }
+.tafel span { color: var(--ink-2); font-size: .84rem; line-height: 1.25; }
+
+.blatt {
+  display: flex;
+  gap: .7rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: .2rem var(--gutter) .7rem;
+  margin: 1.5rem auto;
+  max-width: 44rem;
+  scrollbar-width: none;
+}
+
+.blatt::-webkit-scrollbar { display: none; }
+.blatt figure { flex: 0 0 min(76vw, 21rem); margin: 0; scroll-snap-align: center; }
+.blatt img { width: 100%; }
+.blatt figcaption { padding: 0; }
+
+/* Audio */
+
+.tracks { margin-top: .9rem; margin-bottom: 1.2rem; }
+
+.track {
+  position: relative;
+  display: grid;
+  grid-template-columns: 2.6rem 1fr auto;
+  align-items: center;
+  gap: .75rem;
+  width: 100%;
+  min-height: 3.6rem;
+  padding: .45rem .8rem .45rem .5rem;
+  overflow: hidden;
+  background: var(--stone-2);
+  text-align: left;
+}
+
+.track + .track { margin-top: 2px; }
+
+.track .knopf {
+  display: grid;
+  place-items: center;
+  width: 2.6rem;
+  height: 2.75rem;
+  padding-top: .25rem;
+  background: var(--blue);
+  color: #fff;
+  clip-path: var(--stele);
+}
+
+.track svg, #player svg { width: 1.1rem; height: 1.1rem; fill: currentColor; }
+
+.track .pause, .laeuft .start-icon, .track.an.laeuft .start-icon { display: none; }
+.track.an.laeuft .pause { display: block; }
+
+.track .titel { line-height: 1.22; font-weight: 600; }
+.track .dauer { color: var(--ink-2); font-size: .84rem; font-variant-numeric: tabular-nums; }
+
+.track::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: 100%;
+  background: var(--blue);
+  transform: scaleX(var(--p, 0));
+  transform-origin: left;
+}
+
+@media (prefers-color-scheme: dark) {
+  .track .knopf { background: #2d5874; }
+}
+
+#player {
+  position: fixed;
+  left: .5rem;
+  right: .5rem;
+  bottom: calc(.5rem + var(--bottom));
+  z-index: 25;
+  display: none;
+  grid-template-columns: 2.9rem 1fr 2.7rem 2.2rem;
+  align-items: center;
+  gap: .35rem;
+  max-width: 36rem;
+  margin: 0 auto;
+  padding: .55rem .5rem .45rem;
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(16px) saturate(1.3);
+  backdrop-filter: blur(16px) saturate(1.3);
+  border: 1px solid rgba(255, 255, 255, .16);
+  border-radius: 4px;
+  color: var(--on-night);
+}
+
+body.mit-player #player { display: grid; }
+
+#player button { display: grid; place-items: center; min-height: 2.75rem; }
+
+#pPlay { background: var(--blue-2); color: #08151f; clip-path: var(--stele); padding-top: .25rem; }
+#pPlay .pause { display: none; }
+#player.laeuft #pPlay .pause { display: block; }
+#player.laeuft #pPlay .spiel { display: none; }
+
+.p-mitte { min-width: 0; padding: 0 .3rem; }
+#pTitel { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: .84rem; font-weight: 600; line-height: 1.2; }
+.p-zeit { display: flex; justify-content: space-between; color: var(--on-night-2); font-size: .7rem; line-height: 1.1; font-variant-numeric: tabular-nums; }
+
+#pSuche {
+  display: block;
+  width: 100%;
+  height: 1.3rem;
+  margin: 0;
+  background: none;
+  accent-color: var(--blue-2);
+}
+
+#pZurueck { font-size: .72rem; font-weight: 700; }
+
+/* Timelines, verses, prayers */
+
+.chronik {
+  list-style: none;
+  margin-top: 1.1rem;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(var(--line), var(--line)) calc(var(--gutter) + .28rem) 0 / 2px 100% no-repeat;
+}
+
+.chronik > li { position: relative; padding: 0 0 .85rem 1.35rem; hyphens: auto; }
+
+.chronik > li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: .42em;
+  width: .6rem;
+  height: .75rem;
+  background: var(--blue);
+  clip-path: var(--stele);
+}
+
+.chronik .jahr {
+  display: block;
+  color: var(--blue);
+  font-family: var(--serif);
+  font-size: 1.65rem;
+  font-weight: 500;
+  line-height: 1.15;
+}
+
+.chronik figure { margin: .8rem 0 .4rem; }
+.chronik figure figcaption { padding: 0; }
+
+.verse { list-style: none; }
+.verse li { display: grid; grid-template-columns: 1.3rem 1fr; gap: .2rem .4rem; margin-bottom: .5em; }
+.verse b { color: var(--blue); font-family: var(--serif); font-weight: 500; }
+
+.seite .beleg { color: var(--ink-2); font-size: .84rem; }
+
+.gebet {
+  margin: 2rem 0;
+  padding: 3.6rem 1.35rem;
+  background: var(--night);
+  color: var(--on-night);
+  clip-path: polygon(0 1.8rem, 100% 0, 100% calc(100% - 1.8rem), 0 100%);
+}
+
+.gebet div { max-width: 31rem; margin: 0 auto; }
+
+.gebet p {
+  margin: 0 0 1.25em;
+  font-family: var(--serif);
+  font-size: 1.22rem;
+  line-height: 1.6;
+  hyphens: manual;
+}
+
+.gebet em { color: var(--blue-2); font-style: normal; }
+
+.formel {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: .5rem;
+  margin-top: 1.1rem;
+  margin-bottom: 1.5rem;
+}
+
+.formel div { text-align: center; }
+
+.formel [lang="he"] {
+  display: grid;
+  place-items: center;
+  height: 7rem;
+  padding-top: .9rem;
+  background: var(--stone-2);
+  clip-path: var(--stele);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 3.3rem;
+  line-height: 1;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, .55), 0 -1px 0 rgba(0, 0, 0, .28);
+}
+
+.formel p { margin: .35rem 0 0; font-size: .92rem; line-height: 1.25; hyphens: manual; }
+.formel > span { color: var(--ink-2); font-size: .84rem; }
+
+.hinweis {
+  max-width: 33rem;
+  margin: 1.8rem auto;
+  padding: 1.7rem 1.2rem 1.15rem;
+  background: var(--blue);
+  color: #fff;
+  clip-path: polygon(0 .9rem, 100% 0, 100% 100%, 0 100%);
+  font-family: var(--serif);
+  font-size: 1.16rem;
+  line-height: 1.32;
+  hyphens: manual;
+}
+
+@media (min-width: 37rem) {
+  .hinweis { padding-left: 1.6rem; padding-right: 1.6rem; }
+}
+
+@media (prefers-color-scheme: dark) {
+  .hinweis { background: #24506d; }
+}
+
+/* Mikwe: the page goes down into the water */
+
+.mikwe {
+  margin-top: 2rem;
+  padding: 0 0 2rem;
+  background: linear-gradient(to bottom, var(--stone), #2c4f48 7rem, #0f2d29 28rem, #07201d);
+  color: #e6efe9;
+}
+
+.mikwe h3 { padding-top: 1.5rem; }
+.mikwe figcaption { color: #a8c0b6; }
+.mikwe figure.dok img { border-color: rgba(255, 255, 255, .12); box-shadow: none; }
+.stufen { display: block; width: min(100%, 30rem); margin: 1.4rem auto 0; padding: 0 var(--gutter); }
+
+/* Continue */
+
+.weiter {
+  display: block;
+  margin-top: 2.6rem;
+  padding: 3.4rem 1.2rem calc(1.7rem + var(--bottom) + var(--unten));
+  background: var(--night);
+  color: var(--on-night);
+  clip-path: polygon(0 1.8rem, 100% 0, 100% 100%, 0 100%);
+  text-decoration: none;
+}
+
+.weiter > * { display: block; max-width: var(--measure); margin-left: auto; margin-right: auto; }
+.weiter small { color: var(--on-night-2); font-size: .84rem; }
+.weiter b { font-family: var(--serif); font-size: 1.7rem; font-weight: 400; line-height: 1.15; }
+.weiter .pfeil { margin-top: .5rem; color: var(--blue-2); font-weight: 700; font-size: .92rem; }
+
+/* Impressum */
+
+.impressum a { color: var(--blue); }
+
+/* Image viewer */
+
+#viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: none;
+  background: #0b0f13;
+  color: var(--on-night);
+  touch-action: none;
+}
+
+#viewer.offen { display: block; }
+
+#viewer img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  max-width: 100%;
+  max-height: 100%;
+  transform: translate(-50%, -50%);
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+#vZu {
+  position: absolute;
+  top: calc(var(--top) + .5rem);
+  right: .5rem;
+  z-index: 1;
+  width: 3rem;
+  height: 3rem;
+  background: var(--glass);
+  font-size: 1.5rem;
+  border-radius: 4px;
+}
+
+#vText {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 1.5rem 1rem calc(.8rem + var(--bottom));
+  background: linear-gradient(transparent, rgba(0, 0, 0, .7));
+  font-size: .84rem;
+  line-height: 1.3;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tabcontent.offen, .offen .weg-kern, .offen .karte a { animation: none; }
+  .offen .weg-kern { stroke-dasharray: none; }
+}
 </style>
 </head>
 <body>
 
-<div class="header">
-  <h2>Kulturweg Braunsbach</h2>
-  <p>Auf den Spuren jüdischer Kultur</p>
+<nav id="navbar" aria-label="Stationen">
+  <a class="heim" href="#/Start" aria-label="Zur Karte"><svg class="menora" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="4.4" stroke-linecap="square" aria-hidden="true"><path d="M6 6v32h52V6M15 6v24h34V6M24 6v16h16V6M32 6v50M18 58h28"/></svg></a>
+  <div class="rail">
+    <a class="tablink" href="#/Station0" data-seite="Station0" aria-label="Station 0: Marktplatz"><span>0</span></a>
+    <a class="tablink" href="#/Station1" data-seite="Station1" aria-label="Station 1: Ehemalige Judengasse / Pfalzgasse"><span>1</span></a>
+    <a class="tablink" href="#/Station2" data-seite="Station2" aria-label="Station 2: Haus mit hebräischer Inschrift"><span>2</span></a>
+    <a class="tablink" href="#/Station3" data-seite="Station3" aria-label="Station 3: Doppeltürhaus"><span>3</span></a>
+    <a class="tablink" href="#/Station4" data-seite="Station4" aria-label="Station 4: Judenstäffele"><span>4</span></a>
+    <a class="tablink" href="#/Station5" data-seite="Station5" aria-label="Station 5: Jüdisches Armenhaus"><span>5</span></a>
+    <a class="tablink" href="#/Station6" data-seite="Station6" aria-label="Station 6: Kriegerdenkmal"><span>6</span></a>
+    <a class="tablink" href="#/Station7" data-seite="Station7" aria-label="Station 7: Ehemalige Synagoge"><span>7</span></a>
+    <a class="tablink" href="#/Station8" data-seite="Station8" aria-label="Station 8: Rabbinat"><span>8</span></a>
+    <a class="tablink" href="#/Station9" data-seite="Station9" aria-label="Station 9: Jüdischer Friedhof"><span>9</span></a>
+  </div>
+  <i id="fortschritt"></i>
+</nav>
+
+<div id="Start" class="tabcontent">
+<header class="intro">
+  <div class="marke"><svg class="menora" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="4.4" stroke-linecap="square" aria-hidden="true"><path d="M6 6v32h52V6M15 6v24h34V6M24 6v16h16V6M32 6v50M18 58h28"/></svg></div>
+  <h1>Kulturweg Braunsbach</h1>
+  <p class="claim">Auf den Spuren jüdischer Kultur</p>
+  <ul class="fakten">
+    <li><b>9</b> Stationen</li>
+    <li><b>ca. 3</b> Kilometer</li>
+    <li><b>ca. 120</b> Höhenmeter</li>
+    <li><b>58</b> Min. zum Hören</li>
+  </ul>
+  <a class="los" href="#/Station0">Am Marktplatz beginnen →</a>
+</header>
+<div class="karte">
+  <img src="images/sonstiges-02-karte.svg" width="546" height="968" alt="Karte von Braunsbach mit Kocher, Straßen und Höhenlinien">
+  <svg viewBox="0 0 546 968" role="group" aria-label="Karte des Wegs"><path class="weglinie" d="M255.8 614.9l26.3 16.3 13.3 4.7 -0.3 6.2 2.6 10.9 -2.6 -10.9 0.3 -6.2 26 -1.5 21.6 0.8 3.1 5.2 -5.9 6 5.9 -6 -3.1 -5.2 -21.6 -0.8 -26 1.5 -0.3 6.2 2.6 10.9 5.4 13.4 18.1 27.7 2.8 6.3 11.1 -0.7 15.2 49.1 9.4 26.4 -9.4 -26.4 -15.2 -49.1 8.9 -1.1 15.9 -6.8 12.2 -8.1 -12.2 8.1 -15.9 6.8 -17.1 1 -8.1 2.9 -30.3 16 -25.4 -21.6 -16.8 -24.1 -6.4 -18.3 -5.4 1.2 -4.6 -0.5 -19.6 -7.1 5.1 -17.2 0.6 -24.1 2.3 -5.3 3.6 -3.8 23.5 -12.8 -26.9 -30.6 -5.5 -9.6 -2.2 -7.3 -0.3 -12.4 2 -8.8 3 -3.7 -8.6 -15.9 -12.4 -34.6 -3.9 -2.8 -10.7 -26.3 -26.7 -29.5 -28 -34.3 -27.9 -48.4 2.7 -20 14.3 -7.8 60.3 3.6 77.1 -66 26 -45.9 -1.6 -8.1 -4.8 -4.7 -42.9 -14.2 -19.1 -9.1 -13.1 21.4"/><path class="weg-kern" pathLength="1" d="M255.8 614.9l26.3 16.3 13.3 4.7 -0.3 6.2 2.6 10.9 -2.6 -10.9 0.3 -6.2 26 -1.5 21.6 0.8 3.1 5.2 -5.9 6 5.9 -6 -3.1 -5.2 -21.6 -0.8 -26 1.5 -0.3 6.2 2.6 10.9 5.4 13.4 18.1 27.7 2.8 6.3 11.1 -0.7 15.2 49.1 9.4 26.4 -9.4 -26.4 -15.2 -49.1 8.9 -1.1 15.9 -6.8 12.2 -8.1 -12.2 8.1 -15.9 6.8 -17.1 1 -8.1 2.9 -30.3 16 -25.4 -21.6 -16.8 -24.1 -6.4 -18.3 -5.4 1.2 -4.6 -0.5 -19.6 -7.1 5.1 -17.2 0.6 -24.1 2.3 -5.3 3.6 -3.8 23.5 -12.8 -26.9 -30.6 -5.5 -9.6 -2.2 -7.3 -0.3 -12.4 2 -8.8 3 -3.7 -8.6 -15.9 -12.4 -34.6 -3.9 -2.8 -10.7 -26.3 -26.7 -29.5 -28 -34.3 -27.9 -48.4 2.7 -20 14.3 -7.8 60.3 3.6 77.1 -66 26 -45.9 -1.6 -8.1 -4.8 -4.7 -42.9 -14.2 -19.1 -9.1 -13.1 21.4"/><text class="ort fluss" x="118" y="838" transform="rotate(38 118 838)">Kocher</text><text class="ort" x="150" y="110">Schaalberg</text><a href="#/Station0" data-seite="Station0" style="--i:0" aria-label="Station 0: Marktplatz"><rect class="treffer" x="232" y="586" width="52" height="52"/><path class="stein" d="M244 597L272 592V629H244Z"/><text x="258" y="621">0</text></a><a href="#/Station1" data-seite="Station1" style="--i:1" aria-label="Station 1: Ehemalige Judengasse / Pfalzgasse"><path class="pfad" d="M309 651L315 659"/><circle class="punkt" cx="309" cy="651" r="2.8"/><rect class="treffer" x="289" y="633" width="52" height="52"/><path class="stein" d="M301 644L329 639V676H301Z"/><text x="315" y="668">1</text></a><a href="#/Station2" data-seite="Station2" style="--i:2" aria-label="Station 2: Haus mit hebräischer Inschrift"><path class="pfad" d="M309 631L329 605"/><circle class="punkt" cx="309" cy="631" r="2.8"/><rect class="treffer" x="303" y="579" width="52" height="52"/><path class="stein" d="M315 590L343 585V622H315Z"/><text x="329" y="614">2</text></a><a href="#/Station3" data-seite="Station3" style="--i:3" aria-label="Station 3: Doppeltürhaus"><path class="pfad" d="M327 651L361 637"/><circle class="punkt" cx="327" cy="651" r="2.8"/><rect class="treffer" x="335" y="611" width="52" height="52"/><path class="stein" d="M347 622L375 617V654H347Z"/><text x="361" y="646">3</text></a><a href="#/Station4" data-seite="Station4" style="--i:4" aria-label="Station 4: Judenstäffele"><path class="pfad" d="M298 679L308 699"/><circle class="punkt" cx="298" cy="679" r="2.8"/><rect class="treffer" x="282" y="673" width="52" height="52"/><path class="stein" d="M294 684L322 679V716H294Z"/><text x="308" y="708">4</text></a><a href="#/Station5" data-seite="Station5" style="--i:5" aria-label="Station 5: Jüdisches Armenhaus"><rect class="treffer" x="337" y="753" width="52" height="52"/><path class="stein" d="M349 764L377 759V796H349Z"/><text x="363" y="788">5</text></a><a href="#/Station6" data-seite="Station6" style="--i:6" aria-label="Station 6: Kriegerdenkmal"><path class="pfad" d="M373 686L387 692"/><circle class="punkt" cx="373" cy="686" r="2.8"/><rect class="treffer" x="361" y="666" width="52" height="52"/><path class="stein" d="M373 677L401 672V709H373Z"/><text x="387" y="701">6</text></a><a href="#/Station7" data-seite="Station7" style="--i:7" aria-label="Station 7: Ehemalige Synagoge"><path class="pfad" d="M270 696L266 700"/><circle class="punkt" cx="270" cy="696" r="2.8"/><rect class="treffer" x="240" y="674" width="52" height="52"/><path class="stein" d="M252 685L280 680V717H252Z"/><text x="266" y="709">7</text></a><a href="#/Station8" data-seite="Station8" style="--i:8" aria-label="Station 8: Rabbinat"><rect class="treffer" x="170" y="553" width="52" height="52"/><path class="stein" d="M182 564L210 559V596H182Z"/><text x="196" y="588">8</text></a><a href="#/Station9" data-seite="Station9" style="--i:9" aria-label="Station 9: Jüdischer Friedhof"><rect class="treffer" x="130" y="163" width="52" height="52"/><path class="stein" d="M142 174L170 169V206H142Z"/><text x="156" y="198">9</text></a></svg>
+</div>
+<p class="quelle-karte">Wegverlauf schematisch. Kartendaten © OpenStreetMap-Mitwirkende, Höhenlinien Copernicus DEM.</p>
+<ol class="weg">
+<li><a href="#/Station0" data-seite="Station0"><span class="stein-nr">0</span><span class="name">Marktplatz<small>2 Hörstücke · 4 Min.</small></span><img src="images/station-00-03-haus-fam-koppel-adler.jpg" alt="" loading="lazy" decoding="async"></a></li>
+<li><a href="#/Station1" data-seite="Station1"><span class="stein-nr">1</span><span class="name">Ehemalige Judengasse / Pfalzgasse<small>1 Hörstück · 2 Min.</small></span><img src="images/station-01-03-laubhuette.jpg" alt="" loading="lazy" decoding="async"></a></li>
+<li><a href="#/Station2" data-seite="Station2"><span class="stein-nr">2</span><span class="name">Haus mit hebräischer Inschrift<small>1 Hörstück · 1 Min.</small></span><img src="images/station-02-02-stat1-tuer.jpg" alt="" loading="lazy" decoding="async"></a></li>
+<li><a href="#/Station3" data-seite="Station3"><span class="stein-nr">3</span><span class="name">Doppeltürhaus<small>3 Hörstücke · 6 Min.</small></span><img src="images/station-03-03-doppeltuerhaus-in-ch-endingen.jpg" alt="" loading="lazy" decoding="async"></a></li>
+<li><a href="#/Station4" data-seite="Station4"><span class="stein-nr">4</span><span class="name">Judenstäffele<small>1 Hörstück · 1 Min.</small></span><img src="images/station-04-02-synagoge-vom-judenstaeffele-aus-foto-hanseli.jpg" alt="" loading="lazy" decoding="async"></a></li>
+<li><a href="#/Station5" data-seite="Station5"><span class="stein-nr">5</span><span class="name">Jüdisches Armenhaus<small>2 Hörstücke · 5 Min.</small></span><img src="images/station-05-02-armenhaus-der-jued-gemeinde-foto-kraisss.jpg" alt="" loading="lazy" decoding="async"></a></li>
+<li><a href="#/Station6" data-seite="Station6"><span class="stein-nr">6</span><span class="name">Kriegerdenkmal<small>5 Hörstücke · 9 Min.</small></span><img src="images/station-06-03-1-weltkrieg-fuesilier-regiment-122.jpg" alt="" loading="lazy" decoding="async"></a></li>
+<li><a href="#/Station7" data-seite="Station7"><span class="stein-nr">7</span><span class="name">Ehemalige Synagoge<small>4 Hörstücke · 9 Min.</small></span><img src="images/station-07-05-synagoge-5.jpg" alt="" loading="lazy" decoding="async"></a></li>
+<li><a href="#/Station8" data-seite="Station8"><span class="stein-nr">8</span><span class="name">Rabbinat<small>3 Hörstücke · 9 Min.</small></span><img src="images/station-08-01-ar-7-jk-schild-rabbinat-1a.jpg" alt="" loading="lazy" decoding="async"></a></li>
+<li><a href="#/Station9" data-seite="Station9"><span class="stein-nr">9</span><span class="name">Jüdischer Friedhof<small>5 Hörstücke · 12 Min.</small></span><img src="images/station-09-01-grabstein.png" alt="" loading="lazy" decoding="async"></a></li>
+</ol>
+<div class="fuss"><a href="#/Sonstiges">Impressum</a></div>
 </div>
 
-<div id="navbar">
-  <a class="tablink" onclick="openPage('Station0', this, 'green')" id="defaultOpen">0</a>
-  <a class="tablink" onclick="openPage('Station1', this, 'green')">1</a>
-  <a class="tablink" onclick="openPage('Station2', this, 'green')">2</a>
-  <a class="tablink" onclick="openPage('Station3', this, 'green')">3</a>
-  <a class="tablink" onclick="openPage('Station4', this, 'green')">4</a>
-  <a class="tablink" onclick="openPage('Station5', this, 'green')">5</a>
-  <a class="tablink" onclick="openPage('Station6', this, 'green')">6</a>
-  <a class="tablink" onclick="openPage('Station7', this, 'green')">7</a>
-  <a class="tablink" onclick="openPage('Station8', this, 'green')">8</a>
-  <a class="tablink" onclick="openPage('Station9', this, 'green')">9</a>
-  <a class="tablink" onclick="openPage('Sonstiges', this, 'green')">Sonstiges</a>
-</div>
 
 <div id="Station0" class="tabcontent">
-  <h2>Station 0 Marktplatz</h2>
-  <figure>
-    <img src="images/station-00-01-0-jk-marktplatz-1b-ar.jpg">
-  </figure>
-  <figure>
-    <img src="images/station-00-02-karte-rmb-jk-p-20241103-2-b.jpg">
-  </figure>
-  <p>Einführung: Auf jüdischen Spuren durch Braunsbach <br><br>
+<header class="hero"><img class="hero-img" src="images/station-00-03-haus-fam-koppel-adler.jpg" alt="" loading="lazy" decoding="async" style="--fokus:50% 45%"><h2><span class="stn"><i>Station</i> <b>0</b></span> <span class="ttl">Marktplatz</span></h2></header>
+<div class="seite">
+<div class="meta"><span>2 Hörstücke · 4 Min.</span><button class="aa" aria-label="Schriftgröße ändern">A<small>A</small></button></div>
 
-    <audio controls>
-      <source src="audio/station-00-01-marktplatz-einfuehrung.mp3">
-    </audio> <br>
-    Braunsbach ist eine der zwölf Stationen auf dem „Jüdischen Kulturweg Hohenlohe-Tauber“.<br><br>
-    
-    Im Ort führt der Weg zu neun Stationen, an denen die jüdische Geschichte des Ortes sichtbar wird. Die Stationen sind ausgeschildert. Ferner können Sie über Ihr Smartphone weiterführende Informationen erhalten.<br>
-    Sie können auch über das Rabbinatsmuseum eine Führung bestellen
-    (rabbinatsmuseum<wbr>@braunssbach.de).<br><br>
-    
-    Der Weg ist ca. drei Kilometer lang. Er kann als Rundweg mit beliebigem Anfang gegangen werden. Die letzte Station (Jüdischer Friedhof) liegt auf dem Schaalberg, ca. 120 Höhenmeter über dem Ort. Markierungsschilder mit dem Symbol einer blauen Menora auf weißem Grund kennzeichnen seinen Verlauf.<br><br>
-    
-    Wir wünschen Ihnen einen lehrreichen Aufenthalt auf den jüdischen Spuren in Braunsbach.<br><br><br><br>
-
-    <audio controls>
-      <source src="audio/station-00-02-marktplatz-juedische-geschichte.mp3">
-    </audio> <br>
-
-    In Braunsbach gab es vom Beginn des 17. Jh. bis 1942 eine jüdische Gemeinde. Ihre Mitglieder stellten zeitweise ein Drittel der Ortsbevölkerung. Sie trugen vor allem im 19. Jh. wesentlich zum wirtschaftlichen Aufschwung des Ortes bei.<br><br>
-
-    Im Jahre 1933 lebten noch 49 Juden im Ort. Es gab mehrere jüdische Viehhandlungen, ein Kleider- und Stoffgeschäft, ein Kolonialwaren- und Manufakturgeschäft sowie einen Immobilienhändler. Der überregionale Handel sowie die internationalen familiären Verflechtungen eröffneten der jüdischen wie der christlichen Bevölkerung eine erweiterte Perspektive. Jüdische Religion und Tradition hinterließen bis heute im Ortsbild vielfältige Spuren. <br><br>
-
-    Wir stehen hier auf dem Marktplatz. Hier wurde über Jahrhunderte der Viehmarkt abgehalten, der viele jüdische Händler anzog. Von hier wurden aber auch die letzten Juden einer einst großen jüdischen Gemeinde abtransportiert und in den Tod geschickt.<br><br>
-
-    Auf den ersten Blick sieht der unbefangene Besucher keine Anzeichen für jüdische Geschichte. Doch weil es kein Ghetto im Dorf gab, standen selbstverständlich auch am Marktplatz jüdische Häuser.<br><br>
-
-    So z.B. Haus 1, heute Sanitärgeschäft Wolf. Hier wohnte Familie Adler. Koppel Adler war ein angesehenes Gemeindemitglied. Er war im Talmudverein und spielte Geige. Er hatte 11 Kinder. Sohn Leopold, von Beruf Kantor und Lehrer, wanderte 1939 nach Amerika aus. Von hier schickte er seinen Schwestern u.a. Kleider. So konnte Sarah am Sabbat durch Braunsbach spazieren und sagen: „Was kann ich dafür, dass ich so a schön‘s Judenmädle bin“. <br><br>
-
-    <figure>
-      <img src="images/station-00-03-haus-fam-koppel-adler.jpg">
-      <figcaption>Haus Adler</figcaption>
-    </figure>
-    <figure>
-      <img src="images/station-00-04-sarah-adler.jpg">
-      <figcaption>Sarah Adler</figcaption>
-    </figure>
-
-    Haus 3: Hier lebte Familie Salomon Sahm.
-    Sohn Moses und Tochter Cilly mit Familie wanderten 1938 nach Palästina aus und gründeten gemeinsam mit Rexinger Juden das Kibbuz Shave Zion im Norden des Landes.<br><br>
-    <figure>
-      <img src="images/station-00-05-haus-salomon-sahm-am-marktplatz.jpg">
-      <figcaption>Haus Sahm</figcaption>
-    </figure>
-
-    
-    Am benachbarten Hafenmarkt stand das Haus des Viehhändlers Falk Sahm (genannt „Lederfalk“). Er war 1940 nach Heilbronn ins Altersheim gebracht worden und 1942 nach Maly Trostinec deportiert worden, wo er ermordet wurde.
-    In seinem ehem. Felllager wurden die letzten Juden Braunsbachs bis zu ihrem Abtransport 1942 kaserniert.</p>
-    <figure>
-      <img src="images/station-00-06-haus-falk-sahm-hafenmarkt.jpg">
-      <figcaption>Haus Falk</figcaption>
-    </figure>
-    
+<button class="tafel"><img src="images/station-00-01-0-jk-marktplatz-1b-ar.jpg" width="1190" height="1600" alt="Informationstafel Jüdischer Kulturweg Hohenlohe-Tauber, Braunsbach" loading="lazy" decoding="async"><span><b>Tafel an dieser Station</b><span>Antippen zum Vergrößern</span></span></button>
+<figure class="dok"><img src="images/station-00-02-karte-rmb-jk-p-20241103-2-b.jpg" width="827" height="626" alt="Ortsplan von Braunsbach mit den Stationen des Kulturwegs" loading="lazy" decoding="async"></figure>
+<h3>Einführung: Auf jüdischen Spuren durch Braunsbach</h3>
+<div class="tracks"><button class="track" data-src="audio/station-00-01-marktplatz-einfuehrung.mp3"><span class="knopf"><svg class="start-icon" viewBox="0 0 24 24"><path d="M6 3l15 9-15 9z"/></svg><svg class="pause" viewBox="0 0 24 24"><path d="M5 3h5v18H5zM14 3h5v18h-5z"/></svg></span><span class="titel">Einführung</span><span class="dauer">1:11</span></button></div>
+<p>Braunsbach ist eine der zwölf Stationen auf dem „Jüdischen Kulturweg Hohenlohe-Tauber“.</p>
+<p>Im Ort führt der Weg zu neun Stationen, an denen die jüdische Geschichte des Ortes sichtbar wird. Die Stationen sind ausgeschildert. Ferner können Sie über Ihr Smartphone weiterführende Informationen erhalten.</p>
+<p>Sie können auch über das Rabbinatsmuseum eine Führung bestellen (rabbinatsmuseum<wbr>@braunssbach.de).</p>
+<p>Der Weg ist ca. drei Kilometer lang. Er kann als Rundweg mit beliebigem Anfang gegangen werden. Die letzte Station (Jüdischer Friedhof) liegt auf dem Schaalberg, ca. 120 Höhenmeter über dem Ort. Markierungsschilder mit dem Symbol einer blauen Menora auf weißem Grund kennzeichnen seinen Verlauf.</p>
+<p>Wir wünschen Ihnen einen lehrreichen Aufenthalt auf den jüdischen Spuren in Braunsbach.</p>
+<div class="tracks"><button class="track" data-src="audio/station-00-02-marktplatz-juedische-geschichte.mp3"><span class="knopf"><svg class="start-icon" viewBox="0 0 24 24"><path d="M6 3l15 9-15 9z"/></svg><svg class="pause" viewBox="0 0 24 24"><path d="M5 3h5v18H5zM14 3h5v18h-5z"/></svg></span><span class="titel">Jüdische Geschichte</span><span class="dauer">3:03</span></button></div>
+<p>In Braunsbach gab es vom Beginn des 17. Jh. bis 1942 eine jüdische Gemeinde. Ihre Mitglieder stellten zeitweise ein Drittel der Ortsbevölkerung. Sie trugen vor allem im 19. Jh. wesentlich zum wirtschaftlichen Aufschwung des Ortes bei.</p>
+<p>Im Jahre 1933 lebten noch 49 Juden im Ort. Es gab mehrere jüdische Viehhandlungen, ein Kleider- und Stoffgeschäft, ein Kolonialwaren- und Manufakturgeschäft sowie einen Immobilienhändler. Der überregionale Handel sowie die internationalen familiären Verflechtungen eröffneten der jüdischen wie der christlichen Bevölkerung eine erweiterte Perspektive. Jüdische Religion und Tradition hinterließen bis heute im Ortsbild vielfältige Spuren.</p>
+<p>Wir stehen hier auf dem Marktplatz. Hier wurde über Jahrhunderte der Viehmarkt abgehalten, der viele jüdische Händler anzog. Von hier wurden aber auch die letzten Juden einer einst großen jüdischen Gemeinde abtransportiert und in den Tod geschickt.</p>
+<p>Auf den ersten Blick sieht der unbefangene Besucher keine Anzeichen für jüdische Geschichte. Doch weil es kein Ghetto im Dorf gab, standen selbstverständlich auch am Marktplatz jüdische Häuser.</p>
+<p>So z.B. Haus 1, heute Sanitärgeschäft Wolf. Hier wohnte Familie Adler. Koppel Adler war ein angesehenes Gemeindemitglied. Er war im Talmudverein und spielte Geige. Er hatte 11 Kinder. Sohn Leopold, von Beruf Kantor und Lehrer, wanderte 1939 nach Amerika aus. Von hier schickte er seinen Schwestern u.a. Kleider. So konnte Sarah am Sabbat durch Braunsbach spazieren und sagen: „Was kann ich dafür, dass ich so a schön‘s Judenmädle bin“.</p>
+<figure class="breit"><img src="images/station-00-03-haus-fam-koppel-adler.jpg" width="1143" height="798" alt="Haus Adler" loading="lazy" decoding="async"><figcaption>Haus Adler</figcaption></figure>
+<figure class="hoch"><img src="images/station-00-04-sarah-adler.jpg" width="542" height="1400" alt="Sarah Adler" loading="lazy" decoding="async"><figcaption>Sarah Adler</figcaption></figure>
+<p>Haus 3: Hier lebte Familie Salomon Sahm. Sohn Moses und Tochter Cilly mit Familie wanderten 1938 nach Palästina aus und gründeten gemeinsam mit Rexinger Juden das Kibbuz Shave Zion im Norden des Landes.</p>
+<figure class="breit"><img src="images/station-00-05-haus-salomon-sahm-am-marktplatz.jpg" width="1255" height="1000" alt="Haus Sahm" loading="lazy" decoding="async"><figcaption>Haus Sahm</figcaption></figure>
+<p>Am benachbarten Hafenmarkt stand das Haus des Viehhändlers Falk Sahm (genannt „Lederfalk“). Er war 1940 nach Heilbronn ins Altersheim gebracht worden und 1942 nach Maly Trostinec deportiert worden, wo er ermordet wurde. In seinem ehem. Felllager wurden die letzten Juden Braunsbachs bis zu ihrem Abtransport 1942 kaserniert.</p>
+<figure class="breit"><img src="images/station-00-06-haus-falk-sahm-hafenmarkt.jpg" width="1600" height="1075" alt="Haus Falk" loading="lazy" decoding="async"><figcaption>Haus Falk</figcaption></figure>
+</div>
+<a class="weiter" href="#/Station1"><small>Nächste Station 1</small><b>Ehemalige Judengasse / Pfalzgasse</b><span class="pfeil">Weiter →</span></a>
 </div>
 
 <div id="Station1" class="tabcontent">
-  <h2>Station 1 ehem. Judengasse / Pfalzgasse</h2>
-<figure>
-  <img src="images/station-01-01-jk-2-ar-pfalzgasse.jpg">
-</figure>
-<audio controls>
-  <source src="audio/station-01-01-judengasse.mp3">
-</audio>
-  <p>Eine „Judengasse“ gab es seit dem Mittelalter in zahlreichen Orten. Hier lebte und arbeitete die jüdische Bevölkerung. Das Zusammenleben in einem Bezirk war oft in der Notwendigkeit des Schutzes der ansässigen „Schutzjuden“ begründet. Es beruhte vor allem auf religiösen Prinzipien; z.B. auf dem Gebot am Sabbat nicht mehr als eintausend Schritte zur Synagoge zu gehen. In größeren Orten oder in den Städten gab es deshalb in jedem Wohnbezirk eine Synagoge. Auch in Braunsbach stand die Synagoge in der Nähe der Judengasse. <br><br>
-  </p>
-  <figure>
-    <img src="images/station-01-02-ehem-judengasse.jpg">
-  </figure>
-  <p>
+<header class="hero"><img class="hero-img" src="images/station-01-03-laubhuette.jpg" alt="" loading="lazy" decoding="async" style="--fokus:45% 50%"><h2><span class="stn"><i>Station</i> <b>1</b></span> <span class="ttl">ehem. Judengasse / Pfalzgasse</span></h2></header>
+<div class="seite">
+<div class="meta"><span>1 Hörstück · 2 Min.</span><button class="aa" aria-label="Schriftgröße ändern">A<small>A</small></button></div>
 
-    Obwohl die Juden nicht in den Zünften zugelassen waren, arbeiteten sie in vielen verschiedenen Berufen. Gemäß ihrer Speisegebote hatten die Juden eigene Schlachter und Bäcker. <br><br>
-    
-    Sie verfügten über einen Rat, der sie gegenüber der Herrschaft vertrat. So bildeten sie quasi einen eigenen Ort im Ort, jedoch ohne Abgrenzung oder Ausgrenzung von den übrigen Mitbürgern. Dies sieht man sehr gut auf dem Plan von Braunsbach aus dem Jahre 1828. So wohnte im Haus Nr.109 (heute: Pfalzgasse 10) ein Bäcker, im Haus Nr.112 ein Schlachter. <br><br>
-    
-    Die Häuser in der ehem. Judengasse / heute: Pfalzgasse sind natürlich im Laufe der Zeit umgebaut worden. Früher hatten viele Häuser Balkone/Veranden, auf denen die jüdischen Bewohner alljährlich ihre Sukka, ihre Laubhütte, aufbauten, in der sie das siebentägige Laubhüttenfest feierten und mitunter sogar übernachteten. In der Hohenloher Mundart wurde daraus das Siggesle. 
-    Bei Sonnenaufgang verrichtet der gläubige jüdische Mann, bekleidet mit seinem Gebetsschal und den Gebetsriemen sein Morgengebet. Er kann das überall tun; nach Möglichkeit betet er unter freiem Himmel, also gerne auch im Siggesle.<br><br>
-  </p>
-  <figure>
-    <img src="images/station-01-03-laubhuette.jpg">
-  </figure>
-  <p>
-    <br><br>
-    In der Judengasse gab es sogar ein kleines Kurzwarengeschäft (Frau Wertheimer?).</p> 
+<div class="tracks"><button class="track" data-src="audio/station-01-01-judengasse.mp3"><span class="knopf"><svg class="start-icon" viewBox="0 0 24 24"><path d="M6 3l15 9-15 9z"/></svg><svg class="pause" viewBox="0 0 24 24"><path d="M5 3h5v18H5zM14 3h5v18h-5z"/></svg></span><span class="titel">Die Judengasse</span><span class="dauer">2:23</span></button></div>
+<button class="tafel"><img src="images/station-01-01-jk-2-ar-pfalzgasse.jpg" width="1108" height="1600" alt="Informationstafel Pfalzgasse, ehemalige Judengasse" loading="lazy" decoding="async"><span><b>Tafel an dieser Station</b><span>Antippen zum Vergrößern</span></span></button>
+<p>Eine „Judengasse“ gab es seit dem Mittelalter in zahlreichen Orten. Hier lebte und arbeitete die jüdische Bevölkerung. Das Zusammenleben in einem Bezirk war oft in der Notwendigkeit des Schutzes der ansässigen „Schutzjuden“ begründet. Es beruhte vor allem auf religiösen Prinzipien; z.B. auf dem Gebot am Sabbat nicht mehr als eintausend Schritte zur Synagoge zu gehen. In größeren Orten oder in den Städten gab es deshalb in jedem Wohnbezirk eine Synagoge. Auch in Braunsbach stand die Synagoge in der Nähe der Judengasse.</p>
+<figure class="dok"><img src="images/station-01-02-ehem-judengasse.jpg" width="488" height="444" alt="Ausschnitt aus einem Ortsplan mit markierten Häusern" loading="lazy" decoding="async"></figure>
+<p>Obwohl die Juden nicht in den Zünften zugelassen waren, arbeiteten sie in vielen verschiedenen Berufen. Gemäß ihrer Speisegebote hatten die Juden eigene Schlachter und Bäcker.</p>
+<p>Sie verfügten über einen Rat, der sie gegenüber der Herrschaft vertrat. So bildeten sie quasi einen eigenen Ort im Ort, jedoch ohne Abgrenzung oder Ausgrenzung von den übrigen Mitbürgern. Dies sieht man sehr gut auf dem Plan von Braunsbach aus dem Jahre 1828. So wohnte im Haus Nr.109 (heute: Pfalzgasse 10) ein Bäcker, im Haus Nr.112 ein Schlachter.</p>
+<p>Die Häuser in der ehem. Judengasse / heute: Pfalzgasse sind natürlich im Laufe der Zeit umgebaut worden. Früher hatten viele Häuser Balkone/Veranden, auf denen die jüdischen Bewohner alljährlich ihre Sukka, ihre Laubhütte, aufbauten, in der sie das siebentägige Laubhüttenfest feierten und mitunter sogar übernachteten. In der Hohenloher Mundart wurde daraus das Siggesle. Bei Sonnenaufgang verrichtet der gläubige jüdische Mann, bekleidet mit seinem Gebetsschal und den Gebetsriemen sein Morgengebet. Er kann das überall tun; nach Möglichkeit betet er unter freiem Himmel, also gerne auch im Siggesle.</p>
+<figure class="breit"><img src="images/station-01-03-laubhuette.jpg" width="1600" height="905" alt="Laubhütte auf einem Balkon" loading="lazy" decoding="async"></figure>
+<p>In der Judengasse gab es sogar ein kleines Kurzwarengeschäft (Frau Wertheimer?).</p>
+</div>
+<a class="weiter" href="#/Station2"><small>Nächste Station 2</small><b>Haus mit hebräischer Inschrift</b><span class="pfeil">Weiter →</span></a>
 </div>
 
 <div id="Station2" class="tabcontent">
-  <h2>Station 2 Haus mit hebr. Inschrift</h2>
-  <p>Lippman Jetel (Jachiel) lebte als Schutzjude in der zweiten Generation in Braunsbach. Wahrscheinlich war er ein Viehhändler, wie so mancher seiner Nachfahren. Viele wanderten nach Amerika aus.</p>
-  <p>Julius Lippman (geb. 1853) wanderte mit seinen Brüdern 1881 nach Amerika aus. Allerdings kehrte er nach Deutschland zurück und gründete hier eine Familie. Er starb 1915 und hinterließ eine Tochter. </p>
-  <figure>
-    <img src="images/station-02-01-ar-jk-1.jpg">
-  </figure>
+<header class="hero"><img class="hero-img" src="images/station-02-02-stat1-tuer.jpg" alt="" loading="lazy" decoding="async" style="--fokus:50% 45%"><h2><span class="stn"><i>Station</i> <b>2</b></span> <span class="ttl">Haus mit hebr. Inschrift</span></h2></header>
+<div class="seite">
+<div class="meta"><span>1 Hörstück · 1 Min.</span><button class="aa" aria-label="Schriftgröße ändern">A<small>A</small></button></div>
 
-  <audio controls>
-    <source src="audio/station-02-01-haus.mp3">
-  </audio>
-  <p>In Braunsbach gab es kein Ghetto. Juden lebten in Nachbarschaft mit ihren christlichen Nachbarn. Kleinigkeiten am Haus verrieten, dass sie eine andere Religion hatten. 
-  So hatten ihre Häuser im Türrahmen eine sog. „Mesusakerbe“, in der sich eine Kapsel mit einer kleinen Schriftrolle befand.</p>
-  <p>In Braunsbach gab es kein Ghetto. Juden lebten in Nachbarschaft mit ihren christlichen Nachbarn. Kleinigkeiten am Haus verrieten, dass sie eine andere Religion hatten. 
-  So hatten ihre Häuser im Türrahmen eine sog. „Mesusakerbe“, in der sich eine Kapsel mit einer kleinen Schriftrolle befand.</p>
-  <p>Im Haus Kirchsteige 2 wohnten Ende des 19. /Anfang des 20. Jh. zwei jüdische Familien:  Wertheimer und Wollenberger. Deshalb waren im Türrahmen auch zwei Mesusa-Kerben. </p>
-  <img src="images/station-02-02-stat1-tuer.jpg">
-  <p><!-- Mach <p></p> zwischen bilder und Sounds für einen Zeilenumbruch --></p>
+<p>Lippman Jetel (Jachiel) lebte als Schutzjude in der zweiten Generation in Braunsbach. Wahrscheinlich war er ein Viehhändler, wie so mancher seiner Nachfahren. Viele wanderten nach Amerika aus.</p>
+<p>Julius Lippman (geb. 1853) wanderte mit seinen Brüdern 1881 nach Amerika aus. Allerdings kehrte er nach Deutschland zurück und gründete hier eine Familie. Er starb 1915 und hinterließ eine Tochter.</p>
+<div class="tracks"><button class="track" data-src="audio/station-02-01-haus.mp3"><span class="knopf"><svg class="start-icon" viewBox="0 0 24 24"><path d="M6 3l15 9-15 9z"/></svg><svg class="pause" viewBox="0 0 24 24"><path d="M5 3h5v18H5zM14 3h5v18h-5z"/></svg></span><span class="titel">Das Haus</span><span class="dauer">1:14</span></button></div>
+<button class="tafel"><img src="images/station-02-01-ar-jk-1.jpg" width="1129" height="1600" alt="Informationstafel Haus mit hebräischer Inschrift" loading="lazy" decoding="async"><span><b>Tafel an dieser Station</b><span>Antippen zum Vergrößern</span></span></button>
+<p>In Braunsbach gab es kein Ghetto. Juden lebten in Nachbarschaft mit ihren christlichen Nachbarn. Kleinigkeiten am Haus verrieten, dass sie eine andere Religion hatten. So hatten ihre Häuser im Türrahmen eine sog. „Mesusakerbe“, in der sich eine Kapsel mit einer kleinen Schriftrolle befand.</p>
+<p>In Braunsbach gab es kein Ghetto. Juden lebten in Nachbarschaft mit ihren christlichen Nachbarn. Kleinigkeiten am Haus verrieten, dass sie eine andere Religion hatten. So hatten ihre Häuser im Türrahmen eine sog. „Mesusakerbe“, in der sich eine Kapsel mit einer kleinen Schriftrolle befand.</p>
+<p>Im Haus Kirchsteige 2 wohnten Ende des 19. /Anfang des 20. Jh. zwei jüdische Familien: Wertheimer und Wollenberger. Deshalb waren im Türrahmen auch zwei Mesusa-Kerben.</p>
+<figure class="hoch"><img src="images/station-02-02-stat1-tuer.jpg" width="672" height="933" alt="Alte Holztür mit eisernen Beschlägen" loading="lazy" decoding="async"></figure>
+</div>
+<a class="weiter" href="#/Station3"><small>Nächste Station 3</small><b>Doppeltürhaus</b><span class="pfeil">Weiter →</span></a>
 </div>
 
 <div id="Station3" class="tabcontent">
-  <h2>Station 3 Doppeltürhaus</h2>
-  <figure>
-    <img src="images/station-03-01-jk-3-ar-doppeltuerhaus.jpg">
-  </figure>
-  <audio controls>
-    <source src="audio/station-03-02-doppeltuerhaus.mp3">
-  </audio>
-  <p>Bereits im Mittelalter gab es Gesetze, die die Trennung der Lebensbereiche von Juden und Christen verlangten. Sie sollten z.B. nicht beieinander wohnen. <br><br>
-    <p>
-      <figure>
-        <img src="images/station-03-02-stat3-dekret.jpg">
-        <figcaption>Dekret der Hochfürstlichen Kanzlei zu Würzburg, 5. 3. 1736</figcaption>
-      </figure>
-    </p>
+<header class="hero"><img class="hero-img" src="images/station-03-03-doppeltuerhaus-in-ch-endingen.jpg" alt="" loading="lazy" decoding="async" style="--fokus:45% 50%"><h2><span class="stn"><i>Station</i> <b>3</b></span> <span class="ttl">Doppeltürhaus</span></h2></header>
+<div class="seite">
+<div class="meta"><span>3 Hörstücke · 6 Min.</span><button class="aa" aria-label="Schriftgröße ändern">A<small>A</small></button></div>
 
-    Anfänglich durften Juden weder Häuser noch Land besitzen. Sie behalfen sich, indem sie sich bauwilligen Christen als Geldgeber anboten und danach einen Hausteil mieteten. Weil sie nicht beieinander wohnen sollten, bauten man für das Haus zwei Eingänge. Das Haus wurde im Inneren entweder horizontal oder vertikal geteilt. So kam es zu „Doppeltürhäusern“, in denen verschiedene Konfessionen zeitweise „unter einem Dach“, aber doch getrennt voneinander wohnten. <br><br>
-  </p>
-  <figure>
-    <img src="images/station-03-03-doppeltuerhaus-in-ch-endingen.jpg">
-  </figure>
-  <p>
-    Später konnten Juden auch das ganze Haus oder einen Teil käuflich erwerben. An der Wohnsituation änderte sich grundsätzlich nichts.<br><br>
-    
-    Auch in Braunsbach gab es dafür einzelne Beispiele, z.B. Inselstr, ehem. Haus Schlachter und Nachbarhaus: Hier wohnten bis 1931 Abraham Schlachter und Lazarus Schlachter.<br><br>
-  </p>
-  <figure>
-    <img src="images/station-03-04-ehem-haus-schlachter.jpg">
-    <figcaption>Ehmaliges Haus Schlachter</figcaption>
-  </figure>
-  <p>
-    In dem Doppeltürhaus in der Pfalzgasse wohnte ein Lehrer Adler. Auch Simon Berlinger lebte während seines Schuldienstes 1937/38 in diesem Haus.<br><br>
-  </p>
-  <figure>
-    <img src="images/station-03-05-pfalzgasse.jpg">
-  </figure>
-
-  <h3>Mesusa</h3>
-  <audio controls>
-    <source src="audio/station-03-03-mesusa.mp3">
-  </audio>
-  <p>Das Wort bedeutet Türpfosten. Es bezeichnet eine Kapsel im Türpfosten jüdischer Häuser und Wohnräume, die ein Pergament beinhaltet. In den so gekennzeichneten Räumen ist es erlaubt zu essen und zu schlafen. Auch an Synagogen findet man eine Mesusa.<br><br>
-
-    Die Mesusa wird in Armreichweite im oberen Drittel des (von außen gesehen) rechten Türpfostens geneigt angebracht, und zwar so, dass das obere Ende zum Raum zeigt. Die Begründung für diese Art der Anbringung ist sehr unterschiedlich.<br><br>
-    
-    Auf dem Pergament ist das Gebet Sch’ma Israel  aufgeschrieben: <br>
-    4 Höre, Israel! Der, Ewige, unser Gott, der Ewige ist einzig.<br>
-    5 Darum sollst du den Herrn, deinen Gott, lieben mit ganzem Herzen, mit ganzer Seele und mit ganzer Kraft. <br>
-    6 Diese Worte, auf die ich dich heute verpflichte, sollen auf deinem Herzen geschrieben stehen. <br>
-    7 Du sollst sie deinen Söhnen wiederholen. Du sollst von ihnen reden, wenn du zu Hause sitzt und wenn du auf der Straße gehst, wenn du dich schlafen legst und wenn du aufstehst.<br>
-    8 Du sollst sie als Zeichen um das Handgelenk binden. Sie sollen zum Schmuck auf deiner Stirn werden. <br>
-    9 Du sollst sie auf die Türpfosten deines Hauses und in deine Stadttore schreiben. <br><br>
-  
-    (Deut 6,4 ff)
-  </p> 
-  <p>Schma Israel</p>
-  <audio controls>
-    <source src="audio/station-03-01-schma-israel.mp3">
-  </audio>
+<div class="tracks"><button class="track" data-src="audio/station-03-02-doppeltuerhaus.mp3"><span class="knopf"><svg class="start-icon" viewBox="0 0 24 24"><path d="M6 3l15 9-15 9z"/></svg><svg class="pause" viewBox="0 0 24 24"><path d="M5 3h5v18H5zM14 3h5v18h-5z"/></svg></span><span class="titel">Das Doppeltürhaus</span><span class="dauer">1:56</span></button></div>
+<button class="tafel"><img src="images/station-03-01-jk-3-ar-doppeltuerhaus.jpg" width="1245" height="1600" alt="Informationstafel Doppeltürhaus" loading="lazy" decoding="async"><span><b>Tafel an dieser Station</b><span>Antippen zum Vergrößern</span></span></button>
+<p>Bereits im Mittelalter gab es Gesetze, die die Trennung der Lebensbereiche von Juden und Christen verlangten. Sie sollten z.B. nicht beieinander wohnen.</p>
+<figure class="dok"><img src="images/station-03-02-stat3-dekret.jpg" width="1600" height="1366" alt="Dekret der Hochfürstlichen Kanzlei zu Würzburg, 5. 3. 1736" loading="lazy" decoding="async"><figcaption>Dekret der Hochfürstlichen Kanzlei zu Würzburg, 5. 3. 1736</figcaption></figure>
+<p>Anfänglich durften Juden weder Häuser noch Land besitzen. Sie behalfen sich, indem sie sich bauwilligen Christen als Geldgeber anboten und danach einen Hausteil mieteten. Weil sie nicht beieinander wohnen sollten, bauten man für das Haus zwei Eingänge. Das Haus wurde im Inneren entweder horizontal oder vertikal geteilt. So kam es zu „Doppeltürhäusern“, in denen verschiedene Konfessionen zeitweise „unter einem Dach“, aber doch getrennt voneinander wohnten.</p>
+<figure class="hoch"><img src="images/station-03-03-doppeltuerhaus-in-ch-endingen.jpg" width="733" height="612" alt="Hausfassade mit zwei blauen Türen nebeneinander" loading="lazy" decoding="async"></figure>
+<p>Später konnten Juden auch das ganze Haus oder einen Teil käuflich erwerben. An der Wohnsituation änderte sich grundsätzlich nichts.</p>
+<p>Auch in Braunsbach gab es dafür einzelne Beispiele, z.B. Inselstr, ehem. Haus Schlachter und Nachbarhaus: Hier wohnten bis 1931 Abraham Schlachter und Lazarus Schlachter.</p>
+<figure class="hoch"><img src="images/station-03-04-ehem-haus-schlachter.jpg" width="834" height="1153" alt="Ehmaliges Haus Schlachter" loading="lazy" decoding="async"><figcaption>Ehmaliges Haus Schlachter</figcaption></figure>
+<p>In dem Doppeltürhaus in der Pfalzgasse wohnte ein Lehrer Adler. Auch Simon Berlinger lebte während seines Schuldienstes 1937/38 in diesem Haus.</p>
+<figure class="hoch"><img src="images/station-03-05-pfalzgasse.jpg" width="1200" height="1600" alt="Haus in der Pfalzgasse mit Steintreppe und roten Türen" loading="lazy" decoding="async"></figure>
+<h3 id="s3-0">Mesusa</h3>
+<div class="tracks"><button class="track" data-src="audio/station-03-03-mesusa.mp3"><span class="knopf"><svg class="start-icon" viewBox="0 0 24 24"><path d="M6 3l15 9-15 9z"/></svg><svg class="pause" viewBox="0 0 24 24"><path d="M5 3h5v18H5zM14 3h5v18h-5z"/></svg></span><span class="titel">Mesusa</span><span class="dauer">1:37</span></button></div>
+<p>Das Wort bedeutet Türpfosten. Es bezeichnet eine Kapsel im Türpfosten jüdischer Häuser und Wohnräume, die ein Pergament beinhaltet. In den so gekennzeichneten Räumen ist es erlaubt zu essen und zu schlafen. Auch an Synagogen findet man eine Mesusa.</p>
+<p>Die Mesusa wird in Armreichweite im oberen Drittel des (von außen gesehen) rechten Türpfostens geneigt angebracht, und zwar so, dass das obere Ende zum Raum zeigt. Die Begründung für diese Art der Anbringung ist sehr unterschiedlich.</p>
+<p>Auf dem Pergament ist das Gebet Sch’ma Israel aufgeschrieben:</p>
+<ol class="verse"><li><b>4</b><span>Höre, Israel! Der, Ewige, unser Gott, der Ewige ist einzig.</span></li><li><b>5</b><span>Darum sollst du den Herrn, deinen Gott, lieben mit ganzem Herzen, mit ganzer Seele und mit ganzer Kraft.</span></li><li><b>6</b><span>Diese Worte, auf die ich dich heute verpflichte, sollen auf deinem Herzen geschrieben stehen.</span></li><li><b>7</b><span>Du sollst sie deinen Söhnen wiederholen. Du sollst von ihnen reden, wenn du zu Hause sitzt und wenn du auf der Straße gehst, wenn du dich schlafen legst und wenn du aufstehst.</span></li><li><b>8</b><span>Du sollst sie als Zeichen um das Handgelenk binden. Sie sollen zum Schmuck auf deiner Stirn werden.</span></li><li><b>9</b><span>Du sollst sie auf die Türpfosten deines Hauses und in deine Stadttore schreiben.</span></li></ol>
+<p class="beleg">(Deut 6,4 ff)</p>
+<div class="tracks"><button class="track" data-src="audio/station-03-01-schma-israel.mp3"><span class="knopf"><svg class="start-icon" viewBox="0 0 24 24"><path d="M6 3l15 9-15 9z"/></svg><svg class="pause" viewBox="0 0 24 24"><path d="M5 3h5v18H5zM14 3h5v18h-5z"/></svg></span><span class="titel">Schma Israel</span><span class="dauer">1:58</span></button></div>
+</div>
+<a class="weiter" href="#/Station4"><small>Nächste Station 4</small><b>Judenstäffele</b><span class="pfeil">Weiter →</span></a>
 </div>
 
 <div id="Station4" class="tabcontent">
-  <h2>Station 4 Judenstäffele</h2>
-  <figure>
-    <img src="images/station-04-01-jk-4-ar-judenstaeffele.jpg">
-  </figure>
-  <audio controls>
-    <source src="audio/station-04-01-judenstaeffele.mp3">
-  </audio>
-  <p>Den Abgang zur Synagoge war das sog. Judenstäffele. <br><br>
-    
+<header class="hero"><img class="hero-img" src="images/station-04-02-synagoge-vom-judenstaeffele-aus-foto-hanseli.jpg" alt="" loading="lazy" decoding="async" style="--fokus:60% 50%"><h2><span class="stn"><i>Station</i> <b>4</b></span> <span class="ttl">Judenstäffele</span></h2></header>
+<div class="seite">
+<div class="meta"><span>1 Hörstück · 1 Min.</span><button class="aa" aria-label="Schriftgröße ändern">A<small>A</small></button></div>
 
-    Da sie bei der Sturzflut 2016 auch Schaden genommen hatte, musste sie renoviert werden. Bis dahin konnte der Betrachter einen eindrucksvollen Blick auf ihre Südseite mit den prägnanten Rundbogenfenstern werfen. <br><br>
-    <figure>
-      <img src="images/station-04-02-synagoge-vom-judenstaeffele-aus-foto-hanseli.jpg">
-    </figure>
-    
-    Auf dem Bild aus den 1950er Jahren ist noch deutlich das Vordach über dem Eingang zur Mikwe zu erkennen.  <br><br>
-    <figure>
-      <img src="images/station-04-03-judenstaeffele-foto-robert-mueller.jpg">
-    </figure>
-    Auch heute herrscht hier noch eine feuchte Atmosphäre, so dass man sich den Ursprung des in früheren Zeiten notwendigen lebendigen Wassers vorstellen kann. <br><br>
-    
-    Kuriosität am Rande: Als man 2018 im Rahmen der Sanierungsarbeiten
-    hier eine Baugrube ausgehoben und für weitere Arbeiten vorbereitet hatte, war sie über Nacht mit Wasser vollgelaufen, obwohl es keinen Tropfen geregnet hatte.</p> 
+<div class="tracks"><button class="track" data-src="audio/station-04-01-judenstaeffele.mp3"><span class="knopf"><svg class="start-icon" viewBox="0 0 24 24"><path d="M6 3l15 9-15 9z"/></svg><svg class="pause" viewBox="0 0 24 24"><path d="M5 3h5v18H5zM14 3h5v18h-5z"/></svg></span><span class="titel">Das Judenstäffele</span><span class="dauer">1:11</span></button></div>
+<button class="tafel"><img src="images/station-04-01-jk-4-ar-judenstaeffele.jpg" width="1107" height="1600" alt="Informationstafel Judenstäffele" loading="lazy" decoding="async"><span><b>Tafel an dieser Station</b><span>Antippen zum Vergrößern</span></span></button>
+<p>Den Abgang zur Synagoge war das sog. Judenstäffele.</p>
+<p>Da sie bei der Sturzflut 2016 auch Schaden genommen hatte, musste sie renoviert werden. Bis dahin konnte der Betrachter einen eindrucksvollen Blick auf ihre Südseite mit den prägnanten Rundbogenfenstern werfen.</p>
+<figure class="breit"><img src="images/station-04-02-synagoge-vom-judenstaeffele-aus-foto-hanseli.jpg" width="1600" height="1197" alt="Südseite der ehemaligen Synagoge mit Rundbogenfenstern" loading="lazy" decoding="async"></figure>
+<p>Auf dem Bild aus den 1950er Jahren ist noch deutlich das Vordach über dem Eingang zur Mikwe zu erkennen.</p>
+<figure class="breit"><img src="images/station-04-03-judenstaeffele-foto-robert-mueller.jpg" width="1600" height="1035" alt="Blick auf das Judenstäffele und die Synagoge, historische Aufnahme" loading="lazy" decoding="async"></figure>
+<p>Auch heute herrscht hier noch eine feuchte Atmosphäre, so dass man sich den Ursprung des in früheren Zeiten notwendigen lebendigen Wassers vorstellen kann.</p>
+<p>Kuriosität am Rande: Als man 2018 im Rahmen der Sanierungsarbeiten hier eine Baugrube ausgehoben und für weitere Arbeiten vorbereitet hatte, war sie über Nacht mit Wasser vollgelaufen, obwohl es keinen Tropfen geregnet hatte.</p>
+</div>
+<a class="weiter" href="#/Station5"><small>Nächste Station 5</small><b>Jüdisches Armenhaus</b><span class="pfeil">Weiter →</span></a>
 </div>
 
 <div id="Station5" class="tabcontent">
-  <h2>Station 5 Jüdisches Armenhaus</h2>
-  <figure>
-    <img src="images/station-05-01-jk-5-ar-armenhaus-1-kopie.jpg">
-  </figure>
-  <audio controls>
-    <source src="audio/station-05-01-armenhaus-1.mp3">
-  </audio>
-  <audio controls>
-    <source src="audio/station-05-02-armenhaus-2.mp3">
-  </audio>
-  <p>Das Armenhaus entwickelte sich in der Frühen Neuzeit aus dem mittelalterlichen Hospitium und Spital. Es war oft gekoppelt mit einem Waisenhaus, einem Gefängnis, einem Krankenhaus und einem Arbeitshaus.<br><br>
-    <figure>
-      <img src="images/station-05-02-armenhaus-der-jued-gemeinde-foto-kraisss.jpg">
-    </figure>
+<header class="hero"><img class="hero-img" src="images/station-05-02-armenhaus-der-jued-gemeinde-foto-kraisss.jpg" alt="" loading="lazy" decoding="async" style="--fokus:50% 50%"><h2><span class="stn"><i>Station</i> <b>5</b></span> <span class="ttl">Jüdisches Armenhaus</span></h2></header>
+<div class="seite">
+<div class="meta"><span>2 Hörstücke · 5 Min.</span><button class="aa" aria-label="Schriftgröße ändern">A<small>A</small></button></div>
 
-    In Armenhäusern lebten vor allem ältere Menschen, die nicht mehr selbst für ihren Lebensunterhalt sorgen konnten. Sie erhielten dort einen Wohnplatz und tägliche Verpflegung. Die Armenhäuser gehörten früher zum Stadtbild und nahmen nur verarmte Bewohner aus der eigenen Stadt auf. Fremden wurde diese Altersversorgung nicht zuteil. Im Gegensatz zu den Arbeitshäusern waren die Armenhäuser in der Regel keine geschlossenen Anstalten und die Aufnahme freiwillig. <br>
-    Finanziert wurden Armenhäuser in der Regel durch Zuwendungen wohlhabender Bürger sowie durch Zuschüsse von Stadt und Kirche. So machte Moses Löb Rosenstein 1867 eine Stiftung für Arme der jüdischen Gemeinde Braunsbach. Auf dem Land wurde die Armenversorgung teilweise auch aus dem gemeinschaftlichen Gut (Allmende) beglichen.<br>
-    Das Armenhaus der jüdischen Gemeinde Braunsbach befand sich im ehem. Haus Nr. 10 in der Raingasse (heute: Nr. 13). Als Besitzer sind von 1840 bis mindestens 1875 je zur Hälfte die „Judenschaftsgemeinde“ und verschiedene Privatleute eingetragen.  <br><br>
-    <figure>
-      <img src="images/station-05-03-jued-armenhaus-kopie.jpg">
-    </figure>
-    
-    Nach den Unterlagen des Gemeindearchivs Braunsbach betrug der jüdische Anteil am Areal ca. 50 m².
-    Bis in unsere Zeit wurde das Gebäude 13/4 als das jüdische Armenhaus angesehen.<br><br>
-    <figure>
-      <img src="images/station-05-04-jued-armenhaus-katasterplan-raingasse-2017-bearb-detail.jpg">
-    </figure>
-    
-    Wahrscheinlich lebte Elias Frey (1887-1938) hier einige Zeit. Seine Eltern waren verstorben und die Geschwister hatten Braunsbach verlassen. Er konnte keiner geregelten Arbeit nachgehen und verwahrloste vollständig. Auf Anweisung des Bürgermeisters und des örtlichen Arztes musste sein in Schwäbisch Hall lebender Bruder ihn 1936 in die Heilanstalt Grafeneck bei Zwiefalten bringen, wo er 1938 starb.</p> 
-    <figure>
-      <img src="images/station-05-05-elias-frey.jpg">
-    </figure>
-    <figure>
-      <img src="images/station-05-06-frey-elias-2-ab-1936-heilanstalt-zwiefalten.jpg">
-    </figure>
+<div class="tracks"><button class="track" data-src="audio/station-05-01-armenhaus-1.mp3"><span class="knopf"><svg class="start-icon" viewBox="0 0 24 24"><path d="M6 3l15 9-15 9z"/></svg><svg class="pause" viewBox="0 0 24 24"><path d="M5 3h5v18H5zM14 3h5v18h-5z"/></svg></span><span class="titel">Das Armenhaus, Teil 1</span><span class="dauer">2:02</span></button><button class="track" data-src="audio/station-05-02-armenhaus-2.mp3"><span class="knopf"><svg class="start-icon" viewBox="0 0 24 24"><path d="M6 3l15 9-15 9z"/></svg><svg class="pause" viewBox="0 0 24 24"><path d="M5 3h5v18H5zM14 3h5v18h-5z"/></svg></span><span class="titel">Das Armenhaus, Teil 2</span><span class="dauer">3:04</span></button></div>
+<button class="tafel"><img src="images/station-05-01-jk-5-ar-armenhaus-1-kopie.jpg" width="601" height="868" alt="Informationstafel Jüdisches Armenhaus" loading="lazy" decoding="async"><span><b>Tafel an dieser Station</b><span>Antippen zum Vergrößern</span></span></button>
+<p>Das Armenhaus entwickelte sich in der Frühen Neuzeit aus dem mittelalterlichen Hospitium und Spital. Es war oft gekoppelt mit einem Waisenhaus, einem Gefängnis, einem Krankenhaus und einem Arbeitshaus.</p>
+<figure class="breit"><img src="images/station-05-02-armenhaus-der-jued-gemeinde-foto-kraisss.jpg" width="1600" height="1081" alt="Armenhaus der jüdischen Gemeinde" loading="lazy" decoding="async"></figure>
+<p>In Armenhäusern lebten vor allem ältere Menschen, die nicht mehr selbst für ihren Lebensunterhalt sorgen konnten. Sie erhielten dort einen Wohnplatz und tägliche Verpflegung. Die Armenhäuser gehörten früher zum Stadtbild und nahmen nur verarmte Bewohner aus der eigenen Stadt auf. Fremden wurde diese Altersversorgung nicht zuteil. Im Gegensatz zu den Arbeitshäusern waren die Armenhäuser in der Regel keine geschlossenen Anstalten und die Aufnahme freiwillig.</p>
+<p>Finanziert wurden Armenhäuser in der Regel durch Zuwendungen wohlhabender Bürger sowie durch Zuschüsse von Stadt und Kirche. So machte Moses Löb Rosenstein 1867 eine Stiftung für Arme der jüdischen Gemeinde Braunsbach. Auf dem Land wurde die Armenversorgung teilweise auch aus dem gemeinschaftlichen Gut (Allmende) beglichen.</p>
+<p>Das Armenhaus der jüdischen Gemeinde Braunsbach befand sich im ehem. Haus Nr. 10 in der Raingasse (heute: Nr. 13). Als Besitzer sind von 1840 bis mindestens 1875 je zur Hälfte die „Judenschaftsgemeinde“ und verschiedene Privatleute eingetragen.</p>
+<figure class="dok"><img src="images/station-05-03-jued-armenhaus-kopie.jpg" width="1115" height="1600" alt="Handschriftliches Register mit markierten Einträgen" loading="lazy" decoding="async"></figure>
+<p>Nach den Unterlagen des Gemeindearchivs Braunsbach betrug der jüdische Anteil am Areal ca. 50 m². Bis in unsere Zeit wurde das Gebäude 13/4 als das jüdische Armenhaus angesehen.</p>
+<figure class="dok"><img src="images/station-05-04-jued-armenhaus-katasterplan-raingasse-2017-bearb-detail.jpg" width="637" height="781" alt="Katasterplan der Raingasse mit dem ehemaligen jüdischen Armenhaus" loading="lazy" decoding="async"></figure>
+<p>Wahrscheinlich lebte Elias Frey (1887-1938) hier einige Zeit. Seine Eltern waren verstorben und die Geschwister hatten Braunsbach verlassen. Er konnte keiner geregelten Arbeit nachgehen und verwahrloste vollständig. Auf Anweisung des Bürgermeisters und des örtlichen Arztes musste sein in Schwäbisch Hall lebender Bruder ihn 1936 in die Heilanstalt Grafeneck bei Zwiefalten bringen, wo er 1938 starb.</p>
+<figure class="hoch"><img src="images/station-05-05-elias-frey.jpg" width="1051" height="1600" alt="Elias Frey, historische Aufnahme" loading="lazy" decoding="async"></figure>
+<figure class="dok"><img src="images/station-05-06-frey-elias-2-ab-1936-heilanstalt-zwiefalten.jpg" width="1600" height="1113" alt="Aufnahmen von Elias Frey aus der Heilanstalt" loading="lazy" decoding="async"></figure>
+</div>
+<a class="weiter" href="#/Station6"><small>Nächste Station 6</small><b>Kriegerdenkmal</b><span class="pfeil">Weiter →</span></a>
 </div>
 
 <div id="Station6" class="tabcontent">
-  <h2>Station 6 Kriegerdenkmal</h2>
-  <figure>
-    <img src="images/station-06-01-schild-8-version-2-2024-1.jpg">
-  </figure>
-  <audio controls>
-    <source src="audio/station-06-04-kriegerdenkmal-juedische-kriegsteilnehmer.mp3">
-  </audio>
-  <h3>Jüdische Kriegsteilnehmer</h3>
-  <p>Unmittelbar vor Beginn des 1. Weltkrieges beschwor Kaiser Wilhelm II. in seiner sog. 2. Balkonrede am 1. August 1914 die nationale Einheit des deutschen Volkes. <br>
-    Darin gelobte er mit feierlicher Gebärde: „Ich kenne keine Parteien und auch keine Konfessionen mehr. Seien wir heute alle deutsche Brüder und nur noch deutsche Brüder“. <br>
-    Viele Juden werteten den Krieg als eine Chance, ihre Vaterlandsliebe zu beweisen. Sie hofften, durch Pflichterfüllung und Opferbereitschaft die volle Integration in die deutsche Gesellschaft zu erreichen. <br><br>
-    
-    Sie wurden in dieser Haltung von verschiedenen jüdischen Verbänden unterstützt. </p> 
-  <p>1 Aufruf 1</p>
-  <audio controls>
-    <source src="audio/station-06-01-1-aufruf-1.mp3">
-  </audio>
-  <p>Schließlich nahmen ca.100.000 deutsche Juden nahmen am Krieg teil.
-    12.000 verloren ihr Leben. <br><br>
-    
-    1918 erhielt der Braunsbacher Rabbiner Dr. Jakob Berlinger das Wilhelmskreuz. Diese Auszeichnung hatte König Wilhelm  II. 1915 für die Männer gestiftet, die sich während des Ersten Weltkriegs, ohne  daran unmittelbar teilgenommen zu haben, in dienstlicher oder freiwilliger Tätigkeit  namhafte Verdienste um die öffentliche Wohlfahrt erworben hatten. <br><br>
-    
-    30.000 Juden hatten im 1. Weltkrieg Auszeichnungen wie z.B. das Eiserne Kreuz erhalten. Sie hofften noch nach 1933, dass ihre Verdienste im 1. Weltkrieg sie vor der national-sozialistischen Verfolgung schützen würden.  Leider vergeblich! </p>
-    <h3>Eisernes Buch</h3>
-    <audio controls>
-      <source src="audio/station-06-05-kriegerdenkmal-eisernes-buch.mp3">
-    </audio>
-    <p>Mit „Eisernen Büchern“ wollten Gemeinden in ganz Deutschland ihren Kriegsteilnehmern ein Denkmal setzen. In Braunsbach führte Hauptlehrer H. Kirchner in den 1920er-Jahren den Gedenkband.<br>
-      Das Buch ist in Leinen gebunden und mit zwei eisernen Spangen zu verschließen. An der Unterseite befinden sich eiserne Nieten. Der erste Hauptteil bildet die Kriegerehrung; hier sind die Mitkämpfer genannt. Viele schwarz-weiße Passbilder unter den aufgeführten Namen zeigen junge Männer mit ernstem Gesicht. Aufgenommen wurden auch jüdische Mitbürger. <br><br>
-      
-      Die Seiten sind mit einem oben und unten verlaufendem grün-schwarzem Schmuckband gestaltet. Auf jedem Blatt ist ein Schwert als Wasserzeichen dargestellt. <br><br>
-      
-      So wird Isaak Heumann, geboren am 12. Juni 1887 in Braunsbach, am 15. Januar 1915 in die 5. Kompagnie des Infanterieregiments 414 eingezogen und kämpft in Lothringen, Ypern und Verdun. Seine Hoffnung, ebenso wie die vieler seiner Glaubensbrüder, damit die Integration ins deutsche Volk zu erreichen, wurde bitter enttäuscht.  Am 1. Dezember 1941 wird Heumann als einer der letzten sieben Juden in Braunsbach nach Riga deportiert und später für tot erklärt. <br><br>
-      
-      In einem weiteren Teil werden die im Kampf gefallenen Helden aufgeführt. Darunter auch Isaac Sahm.<br><br><br></p>
-      <p>Besuchen Sie das restaurierte Kriegerdenkmal für die Gefallenen 
-        des 1. Weltkrieges in der Schlossstraße gegenüber der 
-        Evangelischen Kirche!</p>
-      <audio controls>
-        <source src="audio/station-06-02-hinweis-auf-schlossstrasse.mp3">
-      </audio>
-      <p>Das Kriegerdenkmal für die Gefallenen des Ersten Weltkrieges steht
-        seit 1922 unterhalb des Schlosses von Braunsbach gegenüber der Evangelischen Kirche. 
-        Vor seiner Zerstörung durch eine Sturzflut im Mai 2016 bestand es aus einer zentralen, giebelbekrönten Namenstafel mit Eisernem Kreuz und Kriegsdaten im Giebel, flankiert von niedrigeren Blumenterrassen mit Kugelaufsätzen auf den Brüstungen und Steinbänken davor.</p>
-      <figure>
-        <img src="images/station-06-02-braunsbach-kriegerdenkmal-um-1950.png">
-        <figcaption>Braunsbach Kriegerdenkmal um 1950</figcaption>
-      </figure>
-      <p>Im Jahre 2023 wurde es restauriert und an dem alten Platz wieder errichtet.<br><br>
+<header class="hero"><img class="hero-img" src="images/station-06-03-1-weltkrieg-fuesilier-regiment-122.jpg" alt="" loading="lazy" decoding="async" style="--fokus:50% 50%"><h2><span class="stn"><i>Station</i> <b>6</b></span> <span class="ttl">Kriegerdenkmal</span></h2></header>
+<div class="seite">
+<div class="meta"><span>5 Hörstücke · 9 Min.</span><button class="aa" aria-label="Schriftgröße ändern">A<small>A</small></button></div>
 
-        Auf der Tafel steht in der mittleren Spalte ganz unten der Name 
-        Sahm, Isaak. Er wurde am 26.12.1893 in Braunsbach als jüngster Sohn Abraham Sahms geboren. 1913 wurde er als Füsilier in die 11. Kompanie des Infanterieregiments 122 eingezogen. Er folgte damit  - wie viele seiner Glaubensbrüder -  den Aufrufen des Kaisers und des Reichsvereins der Deutschen Juden. </p>
-        <p>Soldatenlied Wir traben in die Weite</p>
-        <audio controls>
-          <source src="audio/station-06-03-soldatenlied-wir-traben-in-die-weite.mp3">
-        </audio>
-        <figure>
-          <img src="images/station-06-03-1-weltkrieg-fuesilier-regiment-122.jpg">
-          <figcaption>1. Weltkrieg  Füsilier-Regiment_122</figcaption>
-        </figure>
-        <p>Am 18. September 1914 trat das Infanterie Regiment 122 gegen die Franzosen an. Isaak Sahm fiel am ersten Tag der großen Offensive am 22. September bei Montblainville, Arrondissement Verdun. <br><br>
-
-        Sein Name ist auf der Ehrentafel des Eisernen Buches der Gemeinde Braunsbach verzeichnet.</p>
-        <figure>
-          <img src="images/station-06-04-ehrentafel-isaak-sahm.jpg">
-          <figcaption>Ehrentafel Isaak Sahm</figcaption>
-        </figure>
-        <br>
-        <figure>
-          <img src="images/station-06-05-eisernes-buch-2a-titelseite.jpg">
-          <figcaption>Eisernes Buch Titelseite</figcaption>
-        </figure>
-        <br>
-        <figure>
-          <img src="images/station-06-06-eisernes-buch-isaak-heumann-geb-1897.jpg">
-          <figcaption>Eisernes Buch Isaak Heumann geb. 1897</figcaption>
-        </figure>
-        <br>
-        <figure>
-          <img src="images/station-06-07-eisernes-buch-samuel-stern-geb-1895.jpg">
-          <figcaption>Eisernes Buch Samuel Stern geb. 1895</figcaption>
-        </figure>
-        <br>
-        <figure>
-          <img src="images/station-06-08-eisernes-buch-1a.jpg">
-          <figcaption>Eisernes Buch Rückseite</figcaption>
-        </figure>
-      
-
+<div class="tracks"><button class="track" data-src="audio/station-06-04-kriegerdenkmal-juedische-kriegsteilnehmer.mp3"><span class="knopf"><svg class="start-icon" viewBox="0 0 24 24"><path d="M6 3l15 9-15 9z"/></svg><svg class="pause" viewBox="0 0 24 24"><path d="M5 3h5v18H5zM14 3h5v18h-5z"/></svg></span><span class="titel">Jüdische Kriegsteilnehmer</span><span class="dauer">2:15</span></button></div>
+<button class="tafel"><img src="images/station-06-01-schild-8-version-2-2024-1.jpg" width="1116" height="1600" alt="Informationstafel Kriegerdenkmal" loading="lazy" decoding="async"><span><b>Tafel an dieser Station</b><span>Antippen zum Vergrößern</span></span></button>
+<h3 id="s6-0">Jüdische Kriegsteilnehmer</h3>
+<p>Unmittelbar vor Beginn des 1. Weltkrieges beschwor Kaiser Wilhelm II. in seiner sog. 2. Balkonrede am 1. August 1914 die nationale Einheit des deutschen Volkes.</p>
+<p>Darin gelobte er mit feierlicher Gebärde: „Ich kenne keine Parteien und auch keine Konfessionen mehr. Seien wir heute alle deutsche Brüder und nur noch deutsche Brüder“.</p>
+<p>Viele Juden werteten den Krieg als eine Chance, ihre Vaterlandsliebe zu beweisen. Sie hofften, durch Pflichterfüllung und Opferbereitschaft die volle Integration in die deutsche Gesellschaft zu erreichen.</p>
+<p>Sie wurden in dieser Haltung von verschiedenen jüdischen Verbänden unterstützt.</p>
+<div class="tracks"><button class="track" data-src="audio/station-06-01-1-aufruf-1.mp3"><span class="knopf"><svg class="start-icon" viewBox="0 0 24 24"><path d="M6 3l15 9-15 9z"/></svg><svg class="pause" viewBox="0 0 24 24"><path d="M5 3h5v18H5zM14 3h5v18h-5z"/></svg></span><span class="titel">1 Aufruf 1</span><span class="dauer">2:02</span></button></div>
+<p>Schließlich nahmen ca.100.000 deutsche Juden nahmen am Krieg teil. 12.000 verloren ihr Leben.</p>
+<p>1918 erhielt der Braunsbacher Rabbiner Dr. Jakob Berlinger das Wilhelmskreuz. Diese Auszeichnung hatte König Wilhelm II. 1915 für die Männer gestiftet, die sich während des Ersten Weltkriegs, ohne daran unmittelbar teilgenommen zu haben, in dienstlicher oder freiwilliger Tätigkeit namhafte Verdienste um die öffentliche Wohlfahrt erworben hatten.</p>
+<p>30.000 Juden hatten im 1. Weltkrieg Auszeichnungen wie z.B. das Eiserne Kreuz erhalten. Sie hofften noch nach 1933, dass ihre Verdienste im 1. Weltkrieg sie vor der national-sozialistischen Verfolgung schützen würden. Leider vergeblich!</p>
+<h3 id="s6-1">Eisernes Buch</h3>
+<div class="tracks"><button class="track" data-src="audio/station-06-05-kriegerdenkmal-eisernes-buch.mp3"><span class="knopf"><svg class="start-icon" viewBox="0 0 24 24"><path d="M6 3l15 9-15 9z"/></svg><svg class="pause" viewBox="0 0 24 24"><path d="M5 3h5v18H5zM14 3h5v18h-5z"/></svg></span><span class="titel">Eisernes Buch</span><span class="dauer">2:28</span></button></div>
+<p>Mit „Eisernen Büchern“ wollten Gemeinden in ganz Deutschland ihren Kriegsteilnehmern ein Denkmal setzen. In Braunsbach führte Hauptlehrer H. Kirchner in den 1920er-Jahren den Gedenkband.</p>
+<p>Das Buch ist in Leinen gebunden und mit zwei eisernen Spangen zu verschließen. An der Unterseite befinden sich eiserne Nieten. Der erste Hauptteil bildet die Kriegerehrung; hier sind die Mitkämpfer genannt. Viele schwarz-weiße Passbilder unter den aufgeführten Namen zeigen junge Männer mit ernstem Gesicht. Aufgenommen wurden auch jüdische Mitbürger.</p>
+<p>Die Seiten sind mit einem oben und unten verlaufendem grün-schwarzem Schmuckband gestaltet. Auf jedem Blatt ist ein Schwert als Wasserzeichen dargestellt.</p>
+<p>So wird Isaak Heumann, geboren am 12. Juni 1887 in Braunsbach, am 15. Januar 1915 in die 5. Kompagnie des Infanterieregiments 414 eingezogen und kämpft in Lothringen, Ypern und Verdun. Seine Hoffnung, ebenso wie die vieler seiner Glaubensbrüder, damit die Integration ins deutsche Volk zu erreichen, wurde bitter enttäuscht. Am 1. Dezember 1941 wird Heumann als einer der letzten sieben Juden in Braunsbach nach Riga deportiert und später für tot erklärt.</p>
+<p>In einem weiteren Teil werden die im Kampf gefallenen Helden aufgeführt. Darunter auch Isaac Sahm.</p>
+<p class="hinweis">Besuchen Sie das restaurierte Kriegerdenkmal für die Gefallenen des 1. Weltkrieges in der Schlossstraße gegenüber der Evangelischen Kirche!</p>
+<div class="tracks"><button class="track" data-src="audio/station-06-02-hinweis-auf-schlossstrasse.mp3"><span class="knopf"><svg class="start-icon" viewBox="0 0 24 24"><path d="M6 3l15 9-15 9z"/></svg><svg class="pause" viewBox="0 0 24 24"><path d="M5 3h5v18H5zM14 3h5v18h-5z"/></svg></span><span class="titel">Hinweis auf die Schlossstraße</span><span class="dauer">0:16</span></button></div>
+<p>Das Kriegerdenkmal für die Gefallenen des Ersten Weltkrieges steht seit 1922 unterhalb des Schlosses von Braunsbach gegenüber der Evangelischen Kirche. Vor seiner Zerstörung durch eine Sturzflut im Mai 2016 bestand es aus einer zentralen, giebelbekrönten Namenstafel mit Eisernem Kreuz und Kriegsdaten im Giebel, flankiert von niedrigeren Blumenterrassen mit Kugelaufsätzen auf den Brüstungen und Steinbänken davor.</p>
+<figure class="klein"><img src="images/station-06-02-braunsbach-kriegerdenkmal-um-1950.png" width="231" height="177" alt="Braunsbach Kriegerdenkmal um 1950" loading="lazy" decoding="async"><figcaption>Braunsbach Kriegerdenkmal um 1950</figcaption></figure>
+<p>Im Jahre 2023 wurde es restauriert und an dem alten Platz wieder errichtet.</p>
+<p>Auf der Tafel steht in der mittleren Spalte ganz unten der Name Sahm, Isaak. Er wurde am 26.12.1893 in Braunsbach als jüngster Sohn Abraham Sahms geboren. 1913 wurde er als Füsilier in die 11. Kompanie des Infanterieregiments 122 eingezogen. Er folgte damit - wie viele seiner Glaubensbrüder - den Aufrufen des Kaisers und des Reichsvereins der Deutschen Juden.</p>
+<div class="tracks"><button class="track" data-src="audio/station-06-03-soldatenlied-wir-traben-in-die-weite.mp3"><span class="knopf"><svg class="start-icon" viewBox="0 0 24 24"><path d="M6 3l15 9-15 9z"/></svg><svg class="pause" viewBox="0 0 24 24"><path d="M5 3h5v18H5zM14 3h5v18h-5z"/></svg></span><span class="titel">Soldatenlied Wir traben in die Weite</span><span class="dauer">1:54</span></button></div>
+<figure class="breit"><img src="images/station-06-03-1-weltkrieg-fuesilier-regiment-122.jpg" width="1200" height="621" alt="1. Weltkrieg Füsilier-Regiment_122" loading="lazy" decoding="async"><figcaption>1. Weltkrieg Füsilier-Regiment_122</figcaption></figure>
+<p>Am 18. September 1914 trat das Infanterie Regiment 122 gegen die Franzosen an. Isaak Sahm fiel am ersten Tag der großen Offensive am 22. September bei Montblainville, Arrondissement Verdun.</p>
+<p>Sein Name ist auf der Ehrentafel des Eisernen Buches der Gemeinde Braunsbach verzeichnet.</p>
+<div class="blatt"><figure><img src="images/station-06-04-ehrentafel-isaak-sahm.jpg" width="1254" height="1600" alt="Ehrentafel Isaak Sahm" loading="lazy" decoding="async"><figcaption>Ehrentafel Isaak Sahm</figcaption></figure><figure><img src="images/station-06-05-eisernes-buch-2a-titelseite.jpg" width="1235" height="1600" alt="Eisernes Buch Titelseite" loading="lazy" decoding="async"><figcaption>Eisernes Buch Titelseite</figcaption></figure><figure><img src="images/station-06-06-eisernes-buch-isaak-heumann-geb-1897.jpg" width="1200" height="1600" alt="Eisernes Buch Isaak Heumann geb. 1897" loading="lazy" decoding="async"><figcaption>Eisernes Buch Isaak Heumann geb. 1897</figcaption></figure><figure><img src="images/station-06-07-eisernes-buch-samuel-stern-geb-1895.jpg" width="1216" height="1600" alt="Eisernes Buch Samuel Stern geb. 1895" loading="lazy" decoding="async"><figcaption>Eisernes Buch Samuel Stern geb. 1895</figcaption></figure><figure><img src="images/station-06-08-eisernes-buch-1a.jpg" width="1200" height="1600" alt="Eisernes Buch Rückseite" loading="lazy" decoding="async"><figcaption>Eisernes Buch Rückseite</figcaption></figure></div>
+</div>
+<a class="weiter" href="#/Station7"><small>Nächste Station 7</small><b>Ehemalige Synagoge</b><span class="pfeil">Weiter →</span></a>
 </div>
 
 <div id="Station7" class="tabcontent">
-  <h2>Station 7 ehemalige Synagoge</h2>
-  <figure>
-    <img src="images/station-07-01-jk-6-ar-synagoge.jpg">
-  </figure>
-  <audio controls>
-    <source src="audio/station-07-02-synagoge.mp3">
-  </audio>
-
-  <p>Eine Synagoge ist die wichtigste Einrichtung im Judentum. Sie dient als Gebäude für Versammlungen, gemeinsamen Gottesdienst und als Lehrhaus. Im Jiddischen wird sie deshalb auch „Schul“ genannt. Sie ist kein geweihter Raum.<br><br>
-
-    Synagogen haben keinen einheitlichen Grundriss. Sie werden im architektonischen Stil ihrer Zeit und des Ortes gebaut, an dem sie errichtet werden. Im Inneren haben sie dagegen gemeinsame Merkmale. An der Wand in Richtung Jerusalem befindet sich der Thoraschrein (=Aron ha-kodesch), in dem mindestens eine Thorarolle aufbewahrt wird. Über ihm sind nicht selten eine symbolische Darstellung der Gesetzestafeln (=10 Gebote) und ein Ewiges Licht angebracht. In traditionellen Synagogen befindet sich in der Mitte des Innenraums ein Lesepult (=Alemenor oder Bima), von dem während des Gottesdienstes aus der Thora vorgelesen wird. Ferner gibt es einen für die Frauen abgesonderten Raum; z.B. die Frauenempore.  <br><br>
-    
-    An Rosch ha-Schana, dem jüdischen Neujahrsfest, und 10 Tage später zu Jom Kippur, dem Versöhnungstag, wurde das Schofar geblasen. </p>
-  <p>Schofar 4 Töne</p>
-  <audio controls>
-    <source src="audio/station-07-01-schofar-4-toene.mp3">
-  </audio>
-
-  <h3>Geschichte der Braunsbacher Synagoge</h3>
-  <audio controls>
-    <source src="audio/station-07-03-geschichte-der-synagoge.mp3">
-  </audio>
-  <p>Gegen Ende des 17. Jh. trafen sich die Juden Braunsbachs zum Gottesdienst zunächst im Haus „des alten Marx“. <br><br>
-
-    1729 kaufte Abraham, der Vorsteher der jüdischen Gemeinde, für 90 Gulden ein Gartengrundstück von Philipp Thaidigsmann. <br><br>
-    
-    1731 wurde ein weiteres Grundstück gekauft, um den Zugang zu der für den Synagogenbau erworbenen Parzelle zu sichern. <br><br>
-    
-    Am 31. März 1732 schloss die Judenschaf mit Johann Friedrich Weinbrenner, Zimmermann aus Untermünkheim, einen Vertrag über den Bau der Synagoge, der 1.070 Gulden kosten sollte. <br><br>
-    
-    1732 Einweihung der Synagoge. Charakteristisch für den Bau waren das hohe Tonnengewölbe und die Korbbogenfenster.  <br><br>
-    
-    Im Laufe ihrer Geschichte wurde die Synagoge mehrfach renoviert; zuletzt
-    1927. In dem Zusammenhang wurde der Gemeindevorsteher, Salomon Pfeiffer, für sein Engagement besonders hervorgehoben.<br><br>  
-    
-    Beim Novemberpogrom 1938 wurde die Inneneinrichtung der Synagoge durch unbekannte Täter beschädigt worden sei. Zu „kirchlichen Zwecken“ könne die Synagoge nicht mehr benutzt werden.<br><br>
-    
-    1940 verkaufte die jüdische Gemeinde die Synagoge für 200 RM an die 
-    Bürgerliche Gemeinde. <br><br>
-    
-    
-    1945 wurde die ehemalige Synagoge von alliiertem Militär beschlagnahmt und der Jüdischen Vermögensverwaltung JRSO übergeben.<br><br>
-    
-    Von ihr wurde das Gebäude 1952 an die politische Gemeinde verkauft, die es 1952 zu einer Turn- und Festhalle umbauen ließ. Dazu wurde ein Bühnenraum vorgebaut. <br><br>
-    <figure>
-      <img src="images/station-07-02-synagoge-1950er-j-heute-festhalle-foto-thaidigsmann.jpg">
-    </figure>
-    
-    1984 wurde das Synagogengebäude in den Neubau der "Burgenland-Halle" miteinbezogen, der Bühnenraum der 1950er Jahre wurde wieder abgebrochen. Der ehemalige Synagogenraum ist seitdem Bühnenraum der Festhalle und trägt den Namen Rosensteinsaal.</p> 
-    
-    <h3>Rosensteinsaal</h3>
-    <audio controls>
-      <source src="audio/station-07-04-rosensteinsaal.mp3">
-    </audio>
-    <p>Die ehemalige Synagoge trägt den Namen des früheren jüdischen Mitbürgers Moses Löb Rosenstein. <br><br>
-
-      Er wurde am 7. Januar1808 als Sohn des Viehhändlers Abraham Moses und seiner Frau Klärle in Braunsbach geboren. <br><br>
-      
-      Früh verwaist ging er 1822 nach Frankfurt/M., 
-      wo er ab 1845 als selbständiger Handelsmann tätig war. 1852 beantragte er das Bürgerrecht  und legte 1853 den Bürgereid ab.<br><br> 
-      
-      Er heiratete 1854 die Witwe Charlotte Meyer geb. Cohn aus Hamburg, die 1865 starb. Danach heiratete er Emma Therese Drucker aus Wiesbaden. Beide Ehen blieben kinderlos.<br><br>
-      
-      Am 22.April 1867 machte Moses Löb Rosenstein sein Testament, worin er u.a. die Gemeinde Braunsbach bedachte. 
-      Moses Löb Rosenstein starb am 27.April 1867<br><br>
-      <figure>
-        <img src="images/station-07-03-nachlassakten-1867-460-fol5r-israelit-gemeinde-vermaechtnis.jpg">
-      </figure>
-    </p>
-
-      <p>
-        <h4>Mikwe</h4>
-        <figure>
-          <img src="images/station-07-04-synagoge-20191027-mikwe.jpg">
-        </figure>
-
-
-      Die Mikwe ist im Judentum ein Tauchbad für die rituelle Reinigung. 
-      Ihr Wasser dient nicht der Hygiene, sondern der Reinigung der Seele und des Geistes.<br><br>
-
-      <h4>Das Becken</h4>
-      <figure>
-        <img src="images/station-07-05-synagoge-5.jpg">
-      </figure>
-
-      Das Becken muss so groß sein, dass ein Erwachsener vollständig im Wasser untertauchen kann. Es fasst zwischen 500 und 1000 Liter. Sieben Stufen führen in das Becken hinab.<br><br>
-
-      <h4>Das Wasser</h4>
-      <figure>
-        <img src="images/station-07-06-synagoge-2.jpg">
-      </figure>
-
-      Das Wasser muss „lebendiges“ Wasser sein, d.h. es muss natürlichen Ursprungs sein. Als solches gilt nur Quell-, Grund- oder Regenwasser. <br>
-      Wasser wird als Symbol des Ursprungs angesehen. Deshalb bedeutet das Untertauchen in ihm eine Art Neugeburt.
-      Das Wasser der Braunsbacher Mikwe wurde aus dem Schlossbach eingeleitet. <br><br>
-
-      <h4>Benutzung der Mikwe</h4>
-      <figure>
-        <img src="images/station-07-07-synagoge-7.jpg">
-      </figure>
-
-      Frauen und Männern ist der Besuch der Mikwe vorgeschrieben.. Anlass für die Benutzung ist der Kontakt mit Unreinem; z.B. mit Blut oder einem Toten. Um die Reinheit ihrer Ehe herzustellen, besucht eine Frau nach der Geburt eines Kindes oder nach dem Ende ihrer Menstruation die Mikwe.  Vor der Hochzeit gehen die Brautleute hierher, um den Beginn eines neuen Lebensabschnittes zu dokumentieren. Orthodoxe männliche Juden benutzen die Mikwe vor dem Beginn des Sabbat und vor allem vor dem Beginn des Versöhnungsfestes Jom Kippur. Bevor der Schreiber die Anfertigung einer neuen Thorarolle beginnt, reinigt er sich in der Mikwe.<br><br>
-
-      Bei der Reinigung darf nichts Fremdes am Körper sein; jegliche Art von Bekleidung und auch Schmuck, Lippenstift, Nagellack und Ähnliches sind vor dem Baden abzulegen Nachdem man sich vollständig gereinigt hat, steigt man einzeln und völlig unbekleidet ins Wasser. Der Körper muss vollständig von den Haaren bis zu den Fußsohlen untergetaucht werden.<br><br>
-
-      Eine Mikwebetreuerin/ein Mikwebetreuer teilt zum Abschluss mit, ob das Tauchbad „koscher“ (=gültig) war.<br><br>
-
-      Noch im Wasser spricht man den Segensspruch: „Gelobt seist Du, Ewiger, unser Gott, König der Welt, der uns durch Seine Gebote geheiligt hat, und der uns das Untertauchen befohlen hat.“
-
-      </p>
+<header class="hero"><img class="hero-img" src="images/station-07-05-synagoge-5.jpg" alt="" loading="lazy" decoding="async" style="--fokus:55% 45%"><h2><span class="stn"><i>Station</i> <b>7</b></span> <span class="ttl">ehemalige Synagoge</span></h2></header>
+<div class="seite">
+<div class="meta"><span>4 Hörstücke · 9 Min.</span><button class="aa" aria-label="Schriftgröße ändern">A<small>A</small></button></div>
+<div class="sprung"><button data-sprung="s7-0">Geschichte</button><button data-sprung="s7-1">Rosensteinsaal</button><button data-sprung="s7-2">Mikwe</button></div>
+<div class="tracks"><button class="track" data-src="audio/station-07-02-synagoge.mp3"><span class="knopf"><svg class="start-icon" viewBox="0 0 24 24"><path d="M6 3l15 9-15 9z"/></svg><svg class="pause" viewBox="0 0 24 24"><path d="M5 3h5v18H5zM14 3h5v18h-5z"/></svg></span><span class="titel">Die Synagoge</span><span class="dauer">2:04</span></button></div>
+<button class="tafel"><img src="images/station-07-01-jk-6-ar-synagoge.jpg" width="1107" height="1600" alt="Informationstafel Ehemalige Synagoge" loading="lazy" decoding="async"><span><b>Tafel an dieser Station</b><span>Antippen zum Vergrößern</span></span></button>
+<p>Eine Synagoge ist die wichtigste Einrichtung im Judentum. Sie dient als Gebäude für Versammlungen, gemeinsamen Gottesdienst und als Lehrhaus. Im Jiddischen wird sie deshalb auch „Schul“ genannt. Sie ist kein geweihter Raum.</p>
+<p>Synagogen haben keinen einheitlichen Grundriss. Sie werden im architektonischen Stil ihrer Zeit und des Ortes gebaut, an dem sie errichtet werden. Im Inneren haben sie dagegen gemeinsame Merkmale. An der Wand in Richtung Jerusalem befindet sich der Thoraschrein (=Aron ha-kodesch), in dem mindestens eine Thorarolle aufbewahrt wird. Über ihm sind nicht selten eine symbolische Darstellung der Gesetzestafeln (=10 Gebote) und ein Ewiges Licht angebracht. In traditionellen Synagogen befindet sich in der Mitte des Innenraums ein Lesepult (=Alemenor oder Bima), von dem während des Gottesdienstes aus der Thora vorgelesen wird. Ferner gibt es einen für die Frauen abgesonderten Raum; z.B. die Frauenempore.</p>
+<p>An Rosch ha-Schana, dem jüdischen Neujahrsfest, und 10 Tage später zu Jom Kippur, dem Versöhnungstag, wurde das Schofar geblasen.</p>
+<div class="tracks"><button class="track" data-src="audio/station-07-01-schofar-4-toene.mp3"><span class="knopf"><svg class="start-icon" viewBox="0 0 24 24"><path d="M6 3l15 9-15 9z"/></svg><svg class="pause" viewBox="0 0 24 24"><path d="M5 3h5v18H5zM14 3h5v18h-5z"/></svg></span><span class="titel">Schofar 4 Töne</span><span class="dauer">1:37</span></button></div>
+<h3 id="s7-0">Geschichte der Braunsbacher Synagoge</h3>
+<div class="tracks"><button class="track" data-src="audio/station-07-03-geschichte-der-synagoge.mp3"><span class="knopf"><svg class="start-icon" viewBox="0 0 24 24"><path d="M6 3l15 9-15 9z"/></svg><svg class="pause" viewBox="0 0 24 24"><path d="M5 3h5v18H5zM14 3h5v18h-5z"/></svg></span><span class="titel">Geschichte der Synagoge</span><span class="dauer">3:17</span></button></div>
+<ol class="chronik"><li>Gegen Ende des 17. Jh. trafen sich die Juden Braunsbachs zum Gottesdienst zunächst im Haus „des alten Marx“.</li><li><b class="jahr">1729</b> kaufte Abraham, der Vorsteher der jüdischen Gemeinde, für 90 Gulden ein Gartengrundstück von Philipp Thaidigsmann.</li><li><b class="jahr">1731</b> wurde ein weiteres Grundstück gekauft, um den Zugang zu der für den Synagogenbau erworbenen Parzelle zu sichern.</li><li>Am 31. März 1732 schloss die Judenschaf mit Johann Friedrich Weinbrenner, Zimmermann aus Untermünkheim, einen Vertrag über den Bau der Synagoge, der 1.070 Gulden kosten sollte.</li><li><b class="jahr">1732</b> Einweihung der Synagoge. Charakteristisch für den Bau waren das hohe Tonnengewölbe und die Korbbogenfenster.</li><li>Im Laufe ihrer Geschichte wurde die Synagoge mehrfach renoviert; zuletzt 1927. In dem Zusammenhang wurde der Gemeindevorsteher, Salomon Pfeiffer, für sein Engagement besonders hervorgehoben.</li><li>Beim Novemberpogrom 1938 wurde die Inneneinrichtung der Synagoge durch unbekannte Täter beschädigt worden sei. Zu „kirchlichen Zwecken“ könne die Synagoge nicht mehr benutzt werden.</li><li><b class="jahr">1940</b> verkaufte die jüdische Gemeinde die Synagoge für 200 RM an die Bürgerliche Gemeinde.</li><li><b class="jahr">1945</b> wurde die ehemalige Synagoge von alliiertem Militär beschlagnahmt und der Jüdischen Vermögensverwaltung JRSO übergeben.</li><li>Von ihr wurde das Gebäude 1952 an die politische Gemeinde verkauft, die es 1952 zu einer Turn- und Festhalle umbauen ließ. Dazu wurde ein Bühnenraum vorgebaut.</li><li><figure class="breit"><img src="images/station-07-02-synagoge-1950er-j-heute-festhalle-foto-thaidigsmann.jpg" width="1600" height="1086" alt="Ehemalige Synagoge als Festhalle, Aufnahme aus den 1950er Jahren" loading="lazy" decoding="async"></figure></li><li><b class="jahr">1984</b> wurde das Synagogengebäude in den Neubau der "Burgenland-Halle" miteinbezogen, der Bühnenraum der 1950er Jahre wurde wieder abgebrochen. Der ehemalige Synagogenraum ist seitdem Bühnenraum der Festhalle und trägt den Namen Rosensteinsaal.</li></ol>
+<h3 id="s7-1">Rosensteinsaal</h3>
+<div class="tracks"><button class="track" data-src="audio/station-07-04-rosensteinsaal.mp3"><span class="knopf"><svg class="start-icon" viewBox="0 0 24 24"><path d="M6 3l15 9-15 9z"/></svg><svg class="pause" viewBox="0 0 24 24"><path d="M5 3h5v18H5zM14 3h5v18h-5z"/></svg></span><span class="titel">Rosensteinsaal</span><span class="dauer">1:34</span></button></div>
+<p>Die ehemalige Synagoge trägt den Namen des früheren jüdischen Mitbürgers Moses Löb Rosenstein.</p>
+<p>Er wurde am 7. Januar1808 als Sohn des Viehhändlers Abraham Moses und seiner Frau Klärle in Braunsbach geboren.</p>
+<p>Früh verwaist ging er 1822 nach Frankfurt/M., wo er ab 1845 als selbständiger Handelsmann tätig war. 1852 beantragte er das Bürgerrecht und legte 1853 den Bürgereid ab.</p>
+<p>Er heiratete 1854 die Witwe Charlotte Meyer geb. Cohn aus Hamburg, die 1865 starb. Danach heiratete er Emma Therese Drucker aus Wiesbaden. Beide Ehen blieben kinderlos.</p>
+<p>Am 22.April 1867 machte Moses Löb Rosenstein sein Testament, worin er u.a. die Gemeinde Braunsbach bedachte. Moses Löb Rosenstein starb am 27.April 1867</p>
+<figure class="dok"><img src="images/station-07-03-nachlassakten-1867-460-fol5r-israelit-gemeinde-vermaechtnis.jpg" width="1146" height="1600" alt="Handschriftliche Seite aus den Nachlassakten von 1867" loading="lazy" decoding="async"></figure>
+<section class="abschnitt mikwe"><svg class="stufen" viewBox="0 0 300 148" aria-hidden="true"><rect x="8" y="4" width="284" height="140" fill="#b4c2b2"/><rect x="22" y="13" width="256" height="122" fill="#93ab9c"/><rect x="36" y="22" width="228" height="104" fill="#738f82"/><rect x="50" y="31" width="200" height="86" fill="#56766a"/><rect x="64" y="40" width="172" height="68" fill="#3c5e54"/><rect x="78" y="49" width="144" height="50" fill="#274740"/><rect x="92" y="58" width="116" height="32" fill="#2f8a76"/></svg><h3 id="s7-2">Mikwe</h3>
+<figure class="breit"><img src="images/station-07-04-synagoge-20191027-mikwe.jpg" width="1600" height="1200" alt="Wandbild der Mikwe in einem Ausstellungsraum" loading="lazy" decoding="async"></figure>
+<p>Die Mikwe ist im Judentum ein Tauchbad für die rituelle Reinigung. Ihr Wasser dient nicht der Hygiene, sondern der Reinigung der Seele und des Geistes.</p>
+<h4>Das Becken</h4>
+<figure class="breit"><img src="images/station-07-05-synagoge-5.jpg" width="1600" height="1129" alt="Historische Innenansicht einer Synagoge mit Thoraschrein" loading="lazy" decoding="async"></figure>
+<p>Das Becken muss so groß sein, dass ein Erwachsener vollständig im Wasser untertauchen kann. Es fasst zwischen 500 und 1000 Liter. Sieben Stufen führen in das Becken hinab.</p>
+<h4>Das Wasser</h4>
+<figure class="hoch"><img src="images/station-07-06-synagoge-2.jpg" width="723" height="1083" alt="Historische Außenansicht der Synagoge mit Rundbogenfenstern" loading="lazy" decoding="async"></figure>
+<p>Das Wasser muss „lebendiges“ Wasser sein, d.h. es muss natürlichen Ursprungs sein. Als solches gilt nur Quell-, Grund- oder Regenwasser.</p>
+<p>Wasser wird als Symbol des Ursprungs angesehen. Deshalb bedeutet das Untertauchen in ihm eine Art Neugeburt. Das Wasser der Braunsbacher Mikwe wurde aus dem Schlossbach eingeleitet.</p>
+<h4>Benutzung der Mikwe</h4>
+<figure class="klein"><img src="images/station-07-07-synagoge-7.jpg" width="368" height="545" alt="Historische Innenansicht einer Synagoge" loading="lazy" decoding="async"></figure>
+<p>Frauen und Männern ist der Besuch der Mikwe vorgeschrieben.. Anlass für die Benutzung ist der Kontakt mit Unreinem; z.B. mit Blut oder einem Toten. Um die Reinheit ihrer Ehe herzustellen, besucht eine Frau nach der Geburt eines Kindes oder nach dem Ende ihrer Menstruation die Mikwe. Vor der Hochzeit gehen die Brautleute hierher, um den Beginn eines neuen Lebensabschnittes zu dokumentieren. Orthodoxe männliche Juden benutzen die Mikwe vor dem Beginn des Sabbat und vor allem vor dem Beginn des Versöhnungsfestes Jom Kippur. Bevor der Schreiber die Anfertigung einer neuen Thorarolle beginnt, reinigt er sich in der Mikwe.</p>
+<p>Bei der Reinigung darf nichts Fremdes am Körper sein; jegliche Art von Bekleidung und auch Schmuck, Lippenstift, Nagellack und Ähnliches sind vor dem Baden abzulegen Nachdem man sich vollständig gereinigt hat, steigt man einzeln und völlig unbekleidet ins Wasser. Der Körper muss vollständig von den Haaren bis zu den Fußsohlen untergetaucht werden.</p>
+<p>Eine Mikwebetreuerin/ein Mikwebetreuer teilt zum Abschluss mit, ob das Tauchbad „koscher“ (=gültig) war.</p>
+<p>Noch im Wasser spricht man den Segensspruch: „Gelobt seist Du, Ewiger, unser Gott, König der Welt, der uns durch Seine Gebote geheiligt hat, und der uns das Untertauchen befohlen hat.“</p>
+</section>
+</div>
+<a class="weiter" href="#/Station8"><small>Nächste Station 8</small><b>Rabbinat</b><span class="pfeil">Weiter →</span></a>
 </div>
 
 <div id="Station8" class="tabcontent">
-  <h2>Station 8 Rabbinat</h2>
-  <figure>
-    <img src="images/station-08-01-ar-7-jk-schild-rabbinat-1a.jpg">
-  </figure>
-  <audio controls>
-    <source src="audio/station-08-01-rabbinatsgebaeude.mp3">
-  </audio>
-
-  <h3>Geschichte des Gebäubes</h3>
-  <p>
-    Bereits Ende des 17. Jh. wurde der in Braunsbach ansässige Judenschulmeister Isaac als Rabbi bezeichnet. Er betreute neben der Gemeinde Braunsbach auch die Juden in Steinbach bei Hall und in Dünsbach. Von ihren Gebühren wurde ein Teil seines Gehaltes bestritten.<br><br>
-    
-    1825 stiftete der als Hoffaktor im Dienst des Hohenloher Fürsten von Schillingsfürst stehende Chaim Henle, der aufgrund eines Vertrages der Fürstenhäuser in Braunsbach wohnen musste, 500 fl. als Zuschuss zum Gehalt des Rabbiners. <br><br>
-    
-    Das 1828 erlassene Israelitengesetz sah die Einrichtung von 13 Bezirksrabbinaten im Königreich Württemberg vor. Ausschlaggebend für die Bestimmung des Amtssitzes war die Größe der Gemeinde und die Anzahl ihrer Einrichtungen. Bei der sog. Kircheneinteilung erwies sich Braunsbach als die größte jüdische Gemeinde in dieser Region. Gleichzeitig galten ihre Mitglieder als relativ wohlhabend. So wurde Braunsbach 1832 Amts- und Wohnsitz eines Bezirksrabbiners. <br><br>
-    
-    1834 erwarb die jüdische Gemeinde das Anwesen des 1826 verstorbenen Chaim Henle für 1345 fl. für den Rabbiner.<br><br>
-    
-    Dies blieb so bis 1913, als der letzte Rabbiner, Dr. Jakob Berlinger, seinen Wohnsitz nach Schwäbisch Hall in die Obere Herrengasse verlegte. Dennoch lautete die offizielle Bezeichnung nach wie vor: Bezirksrabbinat Braunsbach, Sitz Schwäbisch Hall.<br><br>
-    
-    1943 verkaufte die Reichsvereinigung der Juden in Deutschland das Gebäude für RM 3.500 an die bürgerliche Gemeinde. Der Verkauf wurde allerdings 1945 durch die amerikanische Besatzungsmacht als ungültig erklärt und die Gemeinde musste Miete an einen Treuhänder bezahlen.  <br><br>
-    
-    Von 1951 bis 1999 war das Gebäude in Privatbesitz.<br><br>
-    
-    Dann erwarb es die bürgerliche Gemeinde erneut.<br><br></p>
-  <h3>Heutige Nutzung des Gebäudes und
-    Erinnerungen an die Geschichte</h3>
-    <audio controls>
-      <source src="audio/station-08-02-rabbinatsgebaeude-heutige-nutzung.mp3">
-    </audio>
-  <p>
-    2004 gründeten Hans K. Schulz und Wolfgang Kuhn einen Förderverein zur Rettung des denkmalgeschützten Hauses. Ziel sollte die Nutzung als „Bildungshaus“ sein.<br><br>
-    
-    Nach Beendigung der Renovierungsarbeiten wurde als erstes im Erdgeschoss das „Rabbinatsmuseum“ eingerichtet und 2008 eröffnet. In den Räumen der ehemaligen israelitischen Schule werden die Geschichte der Landjudengemeinde Braunsbach sowie Grundzüge der jüdischen Religion dargestellt.<br><br>
-    
-    Einige Jahre später zog das „Wichtelnest“, eine Betreuungseinrichtung für Kleinkinder in die erste Etage ein, wo sich früher die Wohnung des Rabbiners befand. Hier gibt ein Wandschrank mit reichen Bemalungen Rätsel auf, welche Funktion er früher hatte. <br><br>
-    
-    Der Gewölbekeller im Untergeschoss bietet Raum für gesellige Treffs der Jugendlichen des Ortes. Was hier sehr verwundert, ist die Tatsache, dass es im Türrahmen eine Mesusakerbe gibt, die normalerweise nur an Haustüren und an Türen im Wohnbereich eines Hauses zu finden sind.  <br><br> 
-    
-    Die zum Hauptgebäude gehörende Remise diente früher als Raum zum Schächten und als Abstellort für den Leichenwagen. Heute steht sie dem Rabbinatsmuseum für Sonderausstellungen zur Verfügung. </p>
-  <h3>Braunsbacher Denksteine</h3>
-  <audio controls>
-    <source src="audio/station-08-03-braunsbacher-denksteine.mp3">
-  </audio>
-  <p>
-    Vor dem Gebäude wurden 2010 die „Braunsbacher Denksteine“ aufgestellt.  (Entwurf: Siegfried Kienle, Architekt in Schwäbisch Hall).<br><br> 
-    
-    Die  Braunsbacher Denksteine  wurden zum Gedächtnis an alle Bewohner jüdischen Glaubens errichtet, die hier zwischen 1600 und 1942 lebten.<br><br> 
-    
-    Die drei Stelen bestehen aus heimischem Muschelkalk. Auf ihnen ist jeweils eine zweilagige Glasscheibe mit Namen von ehemaligen jüdischen Bürgern befestigt. Sie stehen stellvertretend für alle Juden aus Braunsbach, die auf Handelswegen in der Region unterwegs waren; die in die Vereinigten Staaten, nach Palästina oder in ein anderes Land emigrierten und die von den Nationalsozialisten deportiert und ermordet wurden.<br><br> 
-    
-    Zur Symbolik des Denkmals <br><br> 
-    
-    <h4>Steine</h4>
-    Ihr Material ist der die Region prägende Muschelkalk. Mit seinen Musterungen und Einschlüssen hat er vergangene Zeiten konserviert. Die Steine weisen jeweils eine schräg nach unten neigende Bruchkante auf - so wie das Zusammenleben der Christen und Juden abgebrochen wurde und zur Neige ging.<br>
-    Die Steine sind gespalten - auch die jüdische Bevölkerung lebte weitgehend innerlich abgespalten von ihren christlichen Nachbarn. Bis heute spaltet die Frage nach dem Umgang mit der Geschichte die Menschen; auch in Braunsbach. Steine in Verbindung mit Namen waren in der Antike oft ein Bild für die Ewigkeit. <br><br>
-    
-    <h4>Glasscheiben</h4>
-    Vor drei Steinen erheben sich drei Glasscheiben: Glas ist transparent, man kann hindurchsehen und vielleicht wie durch eine Brille manches klarer sehen. Aber es ist gefährdet und zerbrechlich, verletzlich und verletzend. Das Zusammenleben von Juden und Christen erwies sich in den letzten Jahrhunderten oft als brüchig. Wir wissen alle von den Verfolgungen und Pogromen, denen Juden in Europa ausgesetzt waren. <br><br>
-    
-    <h4>Inschriften</h4>
-    Auf den Gläsern ist von den Wegen der Braunsbacher Juden die Rede. Auf dem Weg sein, unterwegs sein - das bedeutet nicht selten unbehaust, heimatlos zu sein. Seit vielen Jahrhunderten lebten die Juden nicht mehr in dem Land, das Gott ihnen nach ihrem Glauben verheißen hatte; sie lebten und leben heute noch oft in der Diaspora. Die Juden, die am Anfang des 17. Jahrhunderts nach Braunsbach kamen, hatten Verfolgung und Vertreibung erlebt; sie erkauften sich den Schutz der hiesigen Herrschaft, da sie nicht in Württemberg, nicht in Hohenlohischem Gebiet und nicht in den Reichsstädten wohnen durften. <br><br>
-    
-    <h4>Namen</h4>
-    Auf den drei Glasplatten sind Namen Braunsbacher Juden stellvertretend für alle aufgeführt, die in der Zeit zwischen 1600 und 1942 hier in unserem Ort lebten. 
-    Einen Namen haben heißt etwas bedeuten. Wessen Name vergessen wird, dessen "Angedenken schwindet von der Erde, kein Nachruhm bleibt ihm mehr im Lande" (Hiob 18,17). Und beim Propheten Isaias heißt es: "Ihnen allen errichte ich in meinem Haus und in meinen Mauern ein Denkmal; ich gebe ihnen einen Namen, …einen ewigen Namen gebe ich ihnen, der niemals getilgt wird." <br><br>
-    
-    Yad Vashem - d.h. ein Name und ein Denkmal!  Wer einmal in Israel war, kennt die bekannte Gedächtnisstätte in Jerusalem, die an die Namen der Shoa-Opfer erinnert.
-    </p>
+<header class="hero hero-denksteine"><svg class="hero-bild" viewBox="0 0 390 470" preserveAspectRatio="xMidYMin slice" aria-hidden="true"><defs><filter id="kalk" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".09 .16" numOctaves="4" seed="7"/><feColorMatrix values="0 0 0 0 .22  0 0 0 0 .2  0 0 0 0 .16  0 0 0 -1.6 1.02"/><feComposite in2="SourceGraphic" operator="in"/><feMerge><feMergeNode in="SourceGraphic"/><feMergeNode/></feMerge></filter></defs><path d="M52 182L128 146V470H52Z" fill="#cdc4b0" filter="url(#kalk)"/><path d="M94.0 164.0l-5 44 7 40-6 52 5 60-3 70 4 62V470" fill="none" stroke="#3a3a36" stroke-width="1.6"/><path d="M36 240L106 204V440H36Z" fill="#bfe3f2" fill-opacity=".2" stroke="#e8f6fb" stroke-opacity=".62"/><path d="M46 286h45" stroke="#f1fafd" stroke-opacity=".62" stroke-width="2"/><path d="M46 310h58" stroke="#f1fafd" stroke-opacity=".62" stroke-width="2"/><path d="M46 334h38" stroke="#f1fafd" stroke-opacity=".62" stroke-width="2"/><path d="M46 358h51" stroke="#f1fafd" stroke-opacity=".62" stroke-width="2"/><path d="M46 382h32" stroke="#f1fafd" stroke-opacity=".62" stroke-width="2"/><path d="M46 406h45" stroke="#f1fafd" stroke-opacity=".62" stroke-width="2"/><path d="M46 430h58" stroke="#f1fafd" stroke-opacity=".62" stroke-width="2"/><path d="M46 454h38" stroke="#f1fafd" stroke-opacity=".62" stroke-width="2"/><path d="M150 120L240 72V470H150Z" fill="#cdc4b0" filter="url(#kalk)"/><path d="M199.0 96.0l-5 44 7 40-6 52 5 60-3 70 4 62V470" fill="none" stroke="#3a3a36" stroke-width="1.6"/><path d="M134 178L218 130V440H134Z" fill="#bfe3f2" fill-opacity=".2" stroke="#e8f6fb" stroke-opacity=".62"/><path d="M144 224h38" stroke="#f1fafd" stroke-opacity=".62" stroke-width="2"/><path d="M144 248h54" stroke="#f1fafd" stroke-opacity=".62" stroke-width="2"/><path d="M144 272h70" stroke="#f1fafd" stroke-opacity=".62" stroke-width="2"/><path d="M144 296h46" stroke="#f1fafd" stroke-opacity=".62" stroke-width="2"/><path d="M144 320h62" stroke="#f1fafd" stroke-opacity=".62" stroke-width="2"/><path d="M144 344h38" stroke="#f1fafd" stroke-opacity=".62" stroke-width="2"/><path d="M144 368h54" stroke="#f1fafd" stroke-opacity=".62" stroke-width="2"/><path d="M144 392h70" stroke="#f1fafd" stroke-opacity=".62" stroke-width="2"/><path d="M262 198L338 168V470H262Z" fill="#cdc4b0" filter="url(#kalk)"/><path d="M304.0 183.0l-5 44 7 40-6 52 5 60-3 70 4 62V470" fill="none" stroke="#3a3a36" stroke-width="1.6"/><path d="M246 256L316 226V440H246Z" fill="#bfe3f2" fill-opacity=".2" stroke="#e8f6fb" stroke-opacity=".62"/><path d="M256 302h45" stroke="#f1fafd" stroke-opacity=".62" stroke-width="2"/><path d="M256 326h58" stroke="#f1fafd" stroke-opacity=".62" stroke-width="2"/><path d="M256 350h38" stroke="#f1fafd" stroke-opacity=".62" stroke-width="2"/><path d="M256 374h51" stroke="#f1fafd" stroke-opacity=".62" stroke-width="2"/><path d="M256 398h32" stroke="#f1fafd" stroke-opacity=".62" stroke-width="2"/><path d="M256 422h45" stroke="#f1fafd" stroke-opacity=".62" stroke-width="2"/><path d="M256 446h58" stroke="#f1fafd" stroke-opacity=".62" stroke-width="2"/><path d="M256 470h38" stroke="#f1fafd" stroke-opacity=".62" stroke-width="2"/></svg><h2><span class="stn"><i>Station</i> <b>8</b></span> <span class="ttl">Rabbinat</span></h2></header>
+<div class="seite">
+<div class="meta"><span>3 Hörstücke · 9 Min.</span><button class="aa" aria-label="Schriftgröße ändern">A<small>A</small></button></div>
+<div class="sprung"><button data-sprung="s8-0">Geschichte</button><button data-sprung="s8-1">Heutige Nutzung</button><button data-sprung="s8-2">Braunsbacher Denksteine</button></div>
+<div class="tracks"><button class="track" data-src="audio/station-08-01-rabbinatsgebaeude.mp3"><span class="knopf"><svg class="start-icon" viewBox="0 0 24 24"><path d="M6 3l15 9-15 9z"/></svg><svg class="pause" viewBox="0 0 24 24"><path d="M5 3h5v18H5zM14 3h5v18h-5z"/></svg></span><span class="titel">Das Rabbinatsgebäude</span><span class="dauer">2:33</span></button></div>
+<button class="tafel"><img src="images/station-08-01-ar-7-jk-schild-rabbinat-1a.jpg" width="1192" height="1600" alt="Informationstafel Rabbinat" loading="lazy" decoding="async"><span><b>Tafel an dieser Station</b><span>Antippen zum Vergrößern</span></span></button>
+<h3 id="s8-0">Geschichte des Gebäubes</h3>
+<ol class="chronik"><li>Bereits Ende des 17. Jh. wurde der in Braunsbach ansässige Judenschulmeister Isaac als Rabbi bezeichnet. Er betreute neben der Gemeinde Braunsbach auch die Juden in Steinbach bei Hall und in Dünsbach. Von ihren Gebühren wurde ein Teil seines Gehaltes bestritten.</li><li><b class="jahr">1825</b> stiftete der als Hoffaktor im Dienst des Hohenloher Fürsten von Schillingsfürst stehende Chaim Henle, der aufgrund eines Vertrages der Fürstenhäuser in Braunsbach wohnen musste, 500 fl. als Zuschuss zum Gehalt des Rabbiners.</li><li>Das 1828 erlassene Israelitengesetz sah die Einrichtung von 13 Bezirksrabbinaten im Königreich Württemberg vor. Ausschlaggebend für die Bestimmung des Amtssitzes war die Größe der Gemeinde und die Anzahl ihrer Einrichtungen. Bei der sog. Kircheneinteilung erwies sich Braunsbach als die größte jüdische Gemeinde in dieser Region. Gleichzeitig galten ihre Mitglieder als relativ wohlhabend. So wurde Braunsbach 1832 Amts- und Wohnsitz eines Bezirksrabbiners.</li><li><b class="jahr">1834</b> erwarb die jüdische Gemeinde das Anwesen des 1826 verstorbenen Chaim Henle für 1345 fl. für den Rabbiner.</li><li>Dies blieb so bis 1913, als der letzte Rabbiner, Dr. Jakob Berlinger, seinen Wohnsitz nach Schwäbisch Hall in die Obere Herrengasse verlegte. Dennoch lautete die offizielle Bezeichnung nach wie vor: Bezirksrabbinat Braunsbach, Sitz Schwäbisch Hall.</li><li><b class="jahr">1943</b> verkaufte die Reichsvereinigung der Juden in Deutschland das Gebäude für RM 3.500 an die bürgerliche Gemeinde. Der Verkauf wurde allerdings 1945 durch die amerikanische Besatzungsmacht als ungültig erklärt und die Gemeinde musste Miete an einen Treuhänder bezahlen.</li><li>Von 1951 bis 1999 war das Gebäude in Privatbesitz.</li><li>Dann erwarb es die bürgerliche Gemeinde erneut.</li></ol>
+<h3 id="s8-1">Heutige Nutzung des Gebäudes und Erinnerungen an die Geschichte</h3>
+<div class="tracks"><button class="track" data-src="audio/station-08-02-rabbinatsgebaeude-heutige-nutzung.mp3"><span class="knopf"><svg class="start-icon" viewBox="0 0 24 24"><path d="M6 3l15 9-15 9z"/></svg><svg class="pause" viewBox="0 0 24 24"><path d="M5 3h5v18H5zM14 3h5v18h-5z"/></svg></span><span class="titel">Heutige Nutzung</span><span class="dauer">1:31</span></button></div>
+<p>2004 gründeten Hans K. Schulz und Wolfgang Kuhn einen Förderverein zur Rettung des denkmalgeschützten Hauses. Ziel sollte die Nutzung als „Bildungshaus“ sein.</p>
+<p>Nach Beendigung der Renovierungsarbeiten wurde als erstes im Erdgeschoss das „Rabbinatsmuseum“ eingerichtet und 2008 eröffnet. In den Räumen der ehemaligen israelitischen Schule werden die Geschichte der Landjudengemeinde Braunsbach sowie Grundzüge der jüdischen Religion dargestellt.</p>
+<p>Einige Jahre später zog das „Wichtelnest“, eine Betreuungseinrichtung für Kleinkinder in die erste Etage ein, wo sich früher die Wohnung des Rabbiners befand. Hier gibt ein Wandschrank mit reichen Bemalungen Rätsel auf, welche Funktion er früher hatte.</p>
+<p>Der Gewölbekeller im Untergeschoss bietet Raum für gesellige Treffs der Jugendlichen des Ortes. Was hier sehr verwundert, ist die Tatsache, dass es im Türrahmen eine Mesusakerbe gibt, die normalerweise nur an Haustüren und an Türen im Wohnbereich eines Hauses zu finden sind.</p>
+<p>Die zum Hauptgebäude gehörende Remise diente früher als Raum zum Schächten und als Abstellort für den Leichenwagen. Heute steht sie dem Rabbinatsmuseum für Sonderausstellungen zur Verfügung.</p>
+<h3 id="s8-2">Braunsbacher Denksteine</h3>
+<div class="tracks"><button class="track" data-src="audio/station-08-03-braunsbacher-denksteine.mp3"><span class="knopf"><svg class="start-icon" viewBox="0 0 24 24"><path d="M6 3l15 9-15 9z"/></svg><svg class="pause" viewBox="0 0 24 24"><path d="M5 3h5v18H5zM14 3h5v18h-5z"/></svg></span><span class="titel">Braunsbacher Denksteine</span><span class="dauer">4:55</span></button></div>
+<p>Vor dem Gebäude wurden 2010 die „Braunsbacher Denksteine“ aufgestellt. (Entwurf: Siegfried Kienle, Architekt in Schwäbisch Hall).</p>
+<p>Die Braunsbacher Denksteine wurden zum Gedächtnis an alle Bewohner jüdischen Glaubens errichtet, die hier zwischen 1600 und 1942 lebten.</p>
+<p>Die drei Stelen bestehen aus heimischem Muschelkalk. Auf ihnen ist jeweils eine zweilagige Glasscheibe mit Namen von ehemaligen jüdischen Bürgern befestigt. Sie stehen stellvertretend für alle Juden aus Braunsbach, die auf Handelswegen in der Region unterwegs waren; die in die Vereinigten Staaten, nach Palästina oder in ein anderes Land emigrierten und die von den Nationalsozialisten deportiert und ermordet wurden.</p>
+<p class="kicker">Zur Symbolik des Denkmals</p>
+<h4>Steine</h4>
+<p>Ihr Material ist der die Region prägende Muschelkalk. Mit seinen Musterungen und Einschlüssen hat er vergangene Zeiten konserviert. Die Steine weisen jeweils eine schräg nach unten neigende Bruchkante auf - so wie das Zusammenleben der Christen und Juden abgebrochen wurde und zur Neige ging.</p>
+<p>Die Steine sind gespalten - auch die jüdische Bevölkerung lebte weitgehend innerlich abgespalten von ihren christlichen Nachbarn. Bis heute spaltet die Frage nach dem Umgang mit der Geschichte die Menschen; auch in Braunsbach. Steine in Verbindung mit Namen waren in der Antike oft ein Bild für die Ewigkeit.</p>
+<h4>Glasscheiben</h4>
+<p>Vor drei Steinen erheben sich drei Glasscheiben: Glas ist transparent, man kann hindurchsehen und vielleicht wie durch eine Brille manches klarer sehen. Aber es ist gefährdet und zerbrechlich, verletzlich und verletzend. Das Zusammenleben von Juden und Christen erwies sich in den letzten Jahrhunderten oft als brüchig. Wir wissen alle von den Verfolgungen und Pogromen, denen Juden in Europa ausgesetzt waren.</p>
+<h4>Inschriften</h4>
+<p>Auf den Gläsern ist von den Wegen der Braunsbacher Juden die Rede. Auf dem Weg sein, unterwegs sein - das bedeutet nicht selten unbehaust, heimatlos zu sein. Seit vielen Jahrhunderten lebten die Juden nicht mehr in dem Land, das Gott ihnen nach ihrem Glauben verheißen hatte; sie lebten und leben heute noch oft in der Diaspora. Die Juden, die am Anfang des 17. Jahrhunderts nach Braunsbach kamen, hatten Verfolgung und Vertreibung erlebt; sie erkauften sich den Schutz der hiesigen Herrschaft, da sie nicht in Württemberg, nicht in Hohenlohischem Gebiet und nicht in den Reichsstädten wohnen durften.</p>
+<h4>Namen</h4>
+<p>Auf den drei Glasplatten sind Namen Braunsbacher Juden stellvertretend für alle aufgeführt, die in der Zeit zwischen 1600 und 1942 hier in unserem Ort lebten. Einen Namen haben heißt etwas bedeuten. Wessen Name vergessen wird, dessen "Angedenken schwindet von der Erde, kein Nachruhm bleibt ihm mehr im Lande" (Hiob 18,17). Und beim Propheten Isaias heißt es: "Ihnen allen errichte ich in meinem Haus und in meinen Mauern ein Denkmal; ich gebe ihnen einen Namen, …einen ewigen Namen gebe ich ihnen, der niemals getilgt wird."</p>
+<p>Yad Vashem - d.h. ein Name und ein Denkmal! Wer einmal in Israel war, kennt die bekannte Gedächtnisstätte in Jerusalem, die an die Namen der Shoa-Opfer erinnert.</p>
+</div>
+<a class="weiter" href="#/Station9"><small>Nächste Station 9</small><b>Jüdischer Friedhof</b><span class="pfeil">Weiter →</span></a>
 </div>
 
 <div id="Station9" class="tabcontent">
-  <h2>Station 9 Der jüdische Friedhof</h2>
-  <audio controls>
-    <source src="audio/station-09-01-juedischer-friedhof.mp3">
-  </audio>
-  <audio controls>
-    <source src="audio/station-09-02-juedischer-friedhof-braunsbach.mp3">
-  </audio>
-  
-  <p>Bis 1740 bestatteten die Braunsbacher Juden ihre Toten auf dem großen Verbandsfriedhof in Schopfloch oder in Berlichingen, je nach ihrem Herkunftsort.<br><br>
-
-    1732 beantragte die israelische Gemeinde die Erlaubnis zum Ankauf von zwei Äckern auf einem aufgelassenen Weinberg auf dem Schaalberg zur Anlage eines eigenen Begräbnisplatzes.  <br><br>
-    
-    Am 23. März 1747 erteilte das Domkapitel die Erlaubnis zum Erwerb der Grundstücke. <br><br>
-    
-    Als Gebühren wurden festgelegt: <br>
-    Für einen Erwachsenen betrug sie 2 Gulden 30 Kreutzer, für ein Kind die Hälfte. <br>
-    Für auswärtige Juden war sie noch höher: für einen Erwachsenen 3 Gulden 45 Kreutzer, für ein Kind 1 Gulden 52 Kreutzer. <br>
-    Eine Umrechnung ist schwierig: Ein Gulden könnte einen Gegenwert von 1 € bis 1,35 € oder 1 kg Brot im 18. Jh. gehabt haben. <br><br>
-    
-    Bis zum Jahre 1806 blieben die Gebühren unverändert. 
-    </p> 
-    <h2>Der Braunsbacher Friedhof</h2>
-    <p>
-      Bis 1740 bestatteten die Braunsbacher Juden ihre Toten auf dem großen Verbandsfriedhof in Schopfloch oder in Berlichingen, je nach ihrem Herkunftsort.<br><br>
-      
-      1732 beantragte die israelische Gemeinde die Erlaubnis zum Ankauf eines Ackers zur Anlage eines eigenen Begräbnisplatzes. <br>
-      Obschon das Domkapitel die Erlaubnis zum Erwerb der Grundstücke erst am 23. März 1747 erteilte, fanden hier schon zuvor Beisetzungen statt. Der älteste Grabstein stammt aus dem Jahr 1740.  <br><br>
-      
-      Fünfzehn Jahre später erstatte der für den Ort zuständige fürstbischöfliche Verwalter dem Domkapitel zu Würzburg einen ausführlichen Bericht über das Gesuch. Als Gelände sollten zwei Flurstücke auf dem Schalberg dienen. Es handelte sich um aufgelassene Weinberge, die für die Landwirtschaft ungeeignet waren. Die Juden wollten beide Stücke kaufen, die darauf liegenden Gülten und Schatzungen bezahlen sowie für jeden Toten 2 Gulden und für jedes Kind 1 Gulden. <br><br>
-      
-      Allerdings wurde die Gebühr höher angesetzt: Für einen Erwachsenen betrug sie 2 Gulden 30 Kreutzer, für ein Kind die Hälfte. Für auswärtige Juden war sie noch höher: für einen Erwachsenen 3 Gulden 45 Kreutzer, für ein Kind 1 Gulden 52 Kreutzer. <br>
-      Eine Umrechnung ist schwierig: Ein Gulden könnte einen Gegenwert von 1 € bis 1,35 € oder 1 kg Brot im 18. Jh. gehabt haben. <br><br>
-      
-      Bis zum Jahre 1806 blieben die Gebühren unverändert. <br><br>
-      
-      Wenn ein fremder Jude, meistens ein Bettler, in der Gemeinde starb, zahlte die gesamte Judenschaft die Begräbnisgebühr. Das war auch der Fall bei einheimischen Juden, die meist hochbetagt ohne Verwandte starben. So wurden z.B. bereits 1754 drei Betteljudenkinder auf Kosten der Gemeinde beerdigt. <br><br>
-      
-      Schon wenige Jahre nach der Eröffnung wählten auch andere Juden Braunsbach als Beisetzungsstätte, weil es wesentlich günstiger lag als Schopfloch. Da der Platz ausreichte, hatte niemand etwas dagegen.  <br><br>
-      
-      Die Zahl der Beerdigungen schwankte beträchtlich. Die Kinderzahl, aber auch die Kindersterblichkeit war sehr hoch. Frauen hatten daher meist eine geringere Lebenserwartung als Männer. Ältere Witwen warn die Ausnahme. Junge Witwen wurden rasch wieder verheiratet. <br><br>
-      
-      1938 fand die letzte Beisetzung statt. Joseph Falk, ein in die Schweiz ausgewanderter Jude, ließ 1979 einen Gedenkstein für die Opfer der Verfolgung errichten. 
-      </p>
-      <h2>Kaddisch</h2>
-      <audio controls>
-        <source src="audio/station-09-03-inschriften-auf-juedischen-grabsteinen.mp3">
-      </audio>
-      <p>
-        Das Kaddisch ist ein Gebet, mit dem Juden Gott loben. <br><br>
-        
-        Sie sprechen es in Gottesdiensten und am Lager eines gerade Verstorbenen. Darum heißt es auch Totengebet. <br><br>
-        
-        Mit dem Kaddisch möchten Juden Gott nach ihrem Leben auf der Erde noch einmal für alles danken und ihn loben. Als Verstorbene können sie aber selbst natürlich nicht mehr beten. Daher spricht dann ein männlicher Verwandter oft das letzte Kaddisch für sie. <br><br><br><br>
-        
-        
-        
-        <font color="#2266ff">
-          "Erhoben und geheiligt werde sein großer Name in der Welt, die er nach seinem Willen erschaffen, und sein Reich erstehe in eurem Leben und in euren Tagen und dem Leben des ganzen Hauses Israel schnell und in naher Zeit, sprechet: Amen!<br><br>
-          
-          Sein großer Name sei gepriesen in Ewigkeit und Ewigkeit der Ewigkeiten!<br>
-          Gepriesen sei und gerühmt und verherrlicht und erhoben und erhöht und gefeiert und hocherhoben und gepriesen der Name des Heiligen, gelobt sei er, hoch über jedem Lob und Gesang, Verherrlichung und Trostverheißung, die je in der Welt gesprochen wurde, sprechet: Amen!<br><br>
-          
-          Nimm in Barmherzigkeit und Wohlgefallen unser Gebet an.<br>
-          Möge Erhörung finden das Gebet und die Bitte von ganz Israel vor seinem Vater im Himmel, sprechet: Amen!<br><br>
-          
-          Der Name des Ewigen sei gepriesen von jetzt an bis in Ewigkeit!<br>
-          Fülle des Friedens und Leben möge vom Himmel herab uns und ganz Israel zuteilwerden, sprechet: Amen!<br><br>
-          
-          Meine Hilfe kommt vom Ewigen, dem Schöpfer von Himmel und Erde.<br>
-          Der Frieden stiftet in seinen Himmelshöhen, stifte Frieden unter uns und ganz Israel, sprechet: Amen!"
-      </font>
-      </p>
-      <h2>Inschriften auf jüdischen Grabsteinen</h2>
-      <audio controls>
-        <source src="audio/station-09-04-grabsteine.mp3">
-      </audio>
-      <p>
-        Bis ins 19. Jahrhundert hinein sind jüdische Grabsteine nur auf Hebräisch beschriftet. <br><br>
-        
-        Eine hebräische Grabinschrift setzt sich aus mehreren Elementen zusammen: den Namen, den Daten des Verstorbenen/der Verstorbenen, gerahmt von einer Einleitungsformel und einem Schlusssegen, und oft erweitert durch einen Segensspruch.<br><br>
-        
-        Die meisten Inschriften beginnen mit einer abgekürzten Einleitungsformel:<br>
-        פ"נ     Hier ist begraben    oder<br>
-        פ"ט    Hier ist geborgen<br><br>
-        
-        Es folgen der Namen (bei Männern oft mit einem Titel versehen, der Auskunft über den gesellschaftlichen Status (z.B. Der Junggeselle, Die Witwer u.Ä.) und innergemeindliche Funktionen gibt), das Sterbedatum sowie das Sterbealter und ein Schlusssegen.  <br>
-        Die Angabe des Geburtsdatums war nicht üblich.<br><br>
-        
-        Die Daten werden in den hebräischen Grabinschriften nach dem Jüdischen Kalender angegeben. <br><br>
-        
-        Gegen Ende des 19. Jh. hat man die Angaben mitunter in lateinischer Schrift auf der Rückseite des Grabsteines verzeichnet. </p>
-        <h2>Symbolik auf jüdischen Grabsteinen</h2>
-        <audio controls>
-          <source src="audio/station-09-05-symbolik.mp3">
-        </audio>
-        <p>Symbolik auf jüdischen Grabsteinen
-
-          Die Symbolik auf jüdischen Grabsteinen ist vielfältig und insbesondere bei den älteren Steinen oft auffälligstes Element der Gestaltung. Auf manchen Friedhöfen in Süddeutschland ist fast jeder Grabstein mit Symbolik und Ornamentik geschmückt. <br><br>
-          
-          Die Symbolik ist in zwei Kategorien zu unterteilen: in jüdische Symbole und solche, die von der Umgebung übernommen wurden. Diese müssen wiederum unterschieden werden von allgemeiner Ornamentik, insbesondere vielfältigen pflanzlichen und floralen Motiven ohne tiefere Bedeutung. Zu den jüdischen Symbolen zählen solche, die auf die Abstammung hinweisen, für ein Ehrenamt in der Gemeinde stehen oder Eigenschaften wie große Gelehrsamkeit und hohes Ansehen hervorheben. Andere symbolisieren den Namen des Verstorbenen oder deuten als allgemein jüdische Symbole auf sein Judentum.<br><br>
-          
-          <figure>
-            <img src="images/station-09-01-grabstein.png">
-            <figcaption>Grabstein</figcaption>
-          </figure>
-          <h4>Segnende Hände</h4>
-          
-          Zu den häufigsten Symbolen zählen diejenigen, die für die Abstammung von den alten Geschlechtern der Kohanim und der Leviten stehen. Diese waren im Tempel für die Darbringung der Opfer zuständig und sprachen den Segen über das Volk. Bei diesem Segen, der sich bis heute in der Synagoge erhalten hat, erhebt der Kohen die Hände in der charakteristischen Fingerhaltung: Daumen und Zeigefinger berühren sich, während Ring- und kleiner Finger abgespreizt werden.
-          Dieses Symbol findet sich nicht auf dem Braunsbacher Friedhof.<br><br>
-          <figure>
-            <img src="images/station-09-02-haende.png">
-            <figcaption>Segnende Hände</figcaption>
-          </figure>
-          
-          <h4>Levitenkanne </h4>
-          
-          Die LEVITENKANNE weist auf levitische Abkunft. Die Leviten waren im Tempel unter anderem für die kultische Reinheit zuständig und wuschen den Priestern vor dem Opferkult die Hände. Dafür steht auf den Grabsteinen das Symbol der Kanne. Diese findet sich in den verschiedensten Formen, als bauchige Waschkrüge, meist mit Untersatz, oder hohe schlanke Gießgefäße, oft von zeitgenössischen Gieß- und Waschgefäßen beeinflusst. Manchmal eingraviert, meist jedoch plastisch hervortretend, schmücken sie Giebel oder Sockel eines Grabsteins.<br><br>
-          
-          
-          <h4>Schofar</h4>
-          
-          Das SCHOFAR  (Widderhorn) verweist auf das Ehrenamt des Schofarbläsers. <br>
-          Es wird an Neujahr und am Versöhnungstag in der Synagoge geblasen, um die Sünder zur Umkehr zu mahnen. Auf Grabsteinen kann es auch als Sinnbild für die Auferstehung verstanden werden: Am Ende der Tage wird der Messias das Große Schofar blasen, um die Verstorbenen aufzuerwecken. <br><br>
-          
-          
-          <h4>Beschneidungsmesser</h4>
-          
-          Der Mohel ist der rituelle Beschneider, der die Beschneidung der jüdischen Knaben am achten Tag nach ihrer Geburt vornimmt. Durch diesen Akt wird der Junge in den Bund mit Gott aufgenommen. 
-          Auf einen Mohel, einen Beschneider, deutet die Darstellung eines Beschneidungsmessers, meist in Verbindung mit den bei der Beschneidung verwendeten zwei Kelchen.<br><br>
-          
-          <h4>Buch</h4>
-          Ein aufgeschlagenes Buch steht für große Gelehrsamkeit und religiöse Bildung. Oft findet es sich auf Grabsteinen von Vorbetern und Rabbinern. <br><br>
-          
-          <h4>Gesetzestafeln</h4>
-          
-          Mitunter findet sich auch die Darstellung der Bundestafeln, auf denen Moses auf dem Berg Sinai die „Zehn Gebote“ empfing. Sie sind ein Symbol für Gesetzestreue, das sich manchmal auch auf Grabsteinen von Männern namens Moses finden lässt. Die miteinanderverbundenen Tafeln zeigen meist die ersten zehn Buchstaben des hebräischen Alphabetes. <br><br>
-          
-          
-          <h4>Akrostichon</h4>
-          
-          Beliebt ist das Akrostichon  (= Leistenvers oder Leistengedicht).<br><br>
-          
-          Dabei ergeben die Anfangsbuchstaben der Zeilen, senkrecht gelesen, den Namen des Verstorbenen.<br>
-          So ergeben z.B. die ersten vier Wörter des Psalms 96,11 ein Akrostichon des Namens Gottes: JHWH.
-          </p>
-          <figure>
-            <img src="images/station-09-03-ichthys.png">
-            <figcaption>ICHTHYS (grch. Fisch)= Zeichen für jesus Christus</figcaption>
-          </figure>
+<header class="hero"><img class="hero-img" src="images/station-09-01-grabstein.png" alt="" loading="lazy" decoding="async" style="--fokus:50% 30%"><h2><span class="stn"><i>Station</i> <b>9</b></span> <span class="ttl">Der jüdische Friedhof</span></h2></header>
+<div class="seite">
+<div class="meta"><span>5 Hörstücke · 12 Min.</span><button class="aa" aria-label="Schriftgröße ändern">A<small>A</small></button></div>
+<div class="sprung"><button data-sprung="s9-0">Friedhof</button><button data-sprung="s9-1">Kaddisch</button><button data-sprung="s9-2">Inschriften</button><button data-sprung="s9-3">Symbolik</button></div>
+<div class="tracks"><button class="track" data-src="audio/station-09-01-juedischer-friedhof.mp3"><span class="knopf"><svg class="start-icon" viewBox="0 0 24 24"><path d="M6 3l15 9-15 9z"/></svg><svg class="pause" viewBox="0 0 24 24"><path d="M5 3h5v18H5zM14 3h5v18h-5z"/></svg></span><span class="titel">Der jüdische Friedhof</span><span class="dauer">1:23</span></button><button class="track" data-src="audio/station-09-02-juedischer-friedhof-braunsbach.mp3"><span class="knopf"><svg class="start-icon" viewBox="0 0 24 24"><path d="M6 3l15 9-15 9z"/></svg><svg class="pause" viewBox="0 0 24 24"><path d="M5 3h5v18H5zM14 3h5v18h-5z"/></svg></span><span class="titel">Der Braunsbacher Friedhof</span><span class="dauer">1:21</span></button></div>
+<p>Bis 1740 bestatteten die Braunsbacher Juden ihre Toten auf dem großen Verbandsfriedhof in Schopfloch oder in Berlichingen, je nach ihrem Herkunftsort.</p>
+<p>1732 beantragte die israelische Gemeinde die Erlaubnis zum Ankauf von zwei Äckern auf einem aufgelassenen Weinberg auf dem Schaalberg zur Anlage eines eigenen Begräbnisplatzes.</p>
+<p>Am 23. März 1747 erteilte das Domkapitel die Erlaubnis zum Erwerb der Grundstücke.</p>
+<p>Als Gebühren wurden festgelegt:</p>
+<p>Für einen Erwachsenen betrug sie 2 Gulden 30 Kreutzer, für ein Kind die Hälfte.</p>
+<p>Für auswärtige Juden war sie noch höher: für einen Erwachsenen 3 Gulden 45 Kreutzer, für ein Kind 1 Gulden 52 Kreutzer.</p>
+<p>Eine Umrechnung ist schwierig: Ein Gulden könnte einen Gegenwert von 1 € bis 1,35 € oder 1 kg Brot im 18. Jh. gehabt haben.</p>
+<p>Bis zum Jahre 1806 blieben die Gebühren unverändert.</p>
+<h3 id="s9-0">Der Braunsbacher Friedhof</h3>
+<p>Bis 1740 bestatteten die Braunsbacher Juden ihre Toten auf dem großen Verbandsfriedhof in Schopfloch oder in Berlichingen, je nach ihrem Herkunftsort.</p>
+<p>1732 beantragte die israelische Gemeinde die Erlaubnis zum Ankauf eines Ackers zur Anlage eines eigenen Begräbnisplatzes.</p>
+<p>Obschon das Domkapitel die Erlaubnis zum Erwerb der Grundstücke erst am 23. März 1747 erteilte, fanden hier schon zuvor Beisetzungen statt. Der älteste Grabstein stammt aus dem Jahr 1740.</p>
+<p>Fünfzehn Jahre später erstatte der für den Ort zuständige fürstbischöfliche Verwalter dem Domkapitel zu Würzburg einen ausführlichen Bericht über das Gesuch. Als Gelände sollten zwei Flurstücke auf dem Schalberg dienen. Es handelte sich um aufgelassene Weinberge, die für die Landwirtschaft ungeeignet waren. Die Juden wollten beide Stücke kaufen, die darauf liegenden Gülten und Schatzungen bezahlen sowie für jeden Toten 2 Gulden und für jedes Kind 1 Gulden.</p>
+<p>Allerdings wurde die Gebühr höher angesetzt: Für einen Erwachsenen betrug sie 2 Gulden 30 Kreutzer, für ein Kind die Hälfte. Für auswärtige Juden war sie noch höher: für einen Erwachsenen 3 Gulden 45 Kreutzer, für ein Kind 1 Gulden 52 Kreutzer.</p>
+<p>Eine Umrechnung ist schwierig: Ein Gulden könnte einen Gegenwert von 1 € bis 1,35 € oder 1 kg Brot im 18. Jh. gehabt haben.</p>
+<p>Bis zum Jahre 1806 blieben die Gebühren unverändert.</p>
+<p>Wenn ein fremder Jude, meistens ein Bettler, in der Gemeinde starb, zahlte die gesamte Judenschaft die Begräbnisgebühr. Das war auch der Fall bei einheimischen Juden, die meist hochbetagt ohne Verwandte starben. So wurden z.B. bereits 1754 drei Betteljudenkinder auf Kosten der Gemeinde beerdigt.</p>
+<p>Schon wenige Jahre nach der Eröffnung wählten auch andere Juden Braunsbach als Beisetzungsstätte, weil es wesentlich günstiger lag als Schopfloch. Da der Platz ausreichte, hatte niemand etwas dagegen.</p>
+<p>Die Zahl der Beerdigungen schwankte beträchtlich. Die Kinderzahl, aber auch die Kindersterblichkeit war sehr hoch. Frauen hatten daher meist eine geringere Lebenserwartung als Männer. Ältere Witwen warn die Ausnahme. Junge Witwen wurden rasch wieder verheiratet.</p>
+<p>1938 fand die letzte Beisetzung statt. Joseph Falk, ein in die Schweiz ausgewanderter Jude, ließ 1979 einen Gedenkstein für die Opfer der Verfolgung errichten.</p>
+<h3 id="s9-1">Kaddisch</h3>
+<div class="tracks"><button class="track" data-src="audio/station-09-03-inschriften-auf-juedischen-grabsteinen.mp3"><span class="knopf"><svg class="start-icon" viewBox="0 0 24 24"><path d="M6 3l15 9-15 9z"/></svg><svg class="pause" viewBox="0 0 24 24"><path d="M5 3h5v18H5zM14 3h5v18h-5z"/></svg></span><span class="titel">Kaddisch</span><span class="dauer">2:18</span></button></div>
+<p>Das Kaddisch ist ein Gebet, mit dem Juden Gott loben.</p>
+<p>Sie sprechen es in Gottesdiensten und am Lager eines gerade Verstorbenen. Darum heißt es auch Totengebet.</p>
+<p>Mit dem Kaddisch möchten Juden Gott nach ihrem Leben auf der Erde noch einmal für alles danken und ihn loben. Als Verstorbene können sie aber selbst natürlich nicht mehr beten. Daher spricht dann ein männlicher Verwandter oft das letzte Kaddisch für sie.</p>
+<blockquote class="gebet"><div><p>"Erhoben und geheiligt werde sein großer Name in der Welt, die er nach seinem Willen erschaffen, und sein Reich erstehe in eurem Leben und in euren Tagen und dem Leben des ganzen Hauses Israel schnell und in naher Zeit, <em>sprechet: Amen!</em></p><p>Sein großer Name sei gepriesen in Ewigkeit und Ewigkeit der Ewigkeiten!<br>Gepriesen sei und gerühmt und verherrlicht und erhoben und erhöht und gefeiert und hocherhoben und gepriesen der Name des Heiligen, gelobt sei er, hoch über jedem Lob und Gesang, Verherrlichung und Trostverheißung, die je in der Welt gesprochen wurde, <em>sprechet: Amen!</em></p><p>Nimm in Barmherzigkeit und Wohlgefallen unser Gebet an.<br>Möge Erhörung finden das Gebet und die Bitte von ganz Israel vor seinem Vater im Himmel, <em>sprechet: Amen!</em></p><p>Der Name des Ewigen sei gepriesen von jetzt an bis in Ewigkeit!<br>Fülle des Friedens und Leben möge vom Himmel herab uns und ganz Israel zuteilwerden, <em>sprechet: Amen!</em></p><p>Meine Hilfe kommt vom Ewigen, dem Schöpfer von Himmel und Erde.<br>Der Frieden stiftet in seinen Himmelshöhen, stifte Frieden unter uns und ganz Israel, <em>sprechet: Amen!</em>"</p></div></blockquote>
+<h3 id="s9-2">Inschriften auf jüdischen Grabsteinen</h3>
+<div class="tracks"><button class="track" data-src="audio/station-09-04-grabsteine.mp3"><span class="knopf"><svg class="start-icon" viewBox="0 0 24 24"><path d="M6 3l15 9-15 9z"/></svg><svg class="pause" viewBox="0 0 24 24"><path d="M5 3h5v18H5zM14 3h5v18h-5z"/></svg></span><span class="titel">Inschriften</span><span class="dauer">1:07</span></button></div>
+<p>Bis ins 19. Jahrhundert hinein sind jüdische Grabsteine nur auf Hebräisch beschriftet.</p>
+<p>Eine hebräische Grabinschrift setzt sich aus mehreren Elementen zusammen: den Namen, den Daten des Verstorbenen/der Verstorbenen, gerahmt von einer Einleitungsformel und einem Schlusssegen, und oft erweitert durch einen Segensspruch.</p>
+<p>Die meisten Inschriften beginnen mit einer abgekürzten Einleitungsformel:</p>
+<div class="formel"><div><span lang="he" dir="rtl">פ"נ</span><p>Hier ist begraben</p></div><span>oder</span><div><span lang="he" dir="rtl">פ"ט</span><p>Hier ist geborgen</p></div></div>
+<p>Es folgen der Namen (bei Männern oft mit einem Titel versehen, der Auskunft über den gesellschaftlichen Status (z.B. Der Junggeselle, Die Witwer u.Ä.) und innergemeindliche Funktionen gibt), das Sterbedatum sowie das Sterbealter und ein Schlusssegen.</p>
+<p>Die Angabe des Geburtsdatums war nicht üblich.</p>
+<p>Die Daten werden in den hebräischen Grabinschriften nach dem Jüdischen Kalender angegeben.</p>
+<p>Gegen Ende des 19. Jh. hat man die Angaben mitunter in lateinischer Schrift auf der Rückseite des Grabsteines verzeichnet.</p>
+<h3 id="s9-3">Symbolik auf jüdischen Grabsteinen</h3>
+<div class="tracks"><button class="track" data-src="audio/station-09-05-symbolik.mp3"><span class="knopf"><svg class="start-icon" viewBox="0 0 24 24"><path d="M6 3l15 9-15 9z"/></svg><svg class="pause" viewBox="0 0 24 24"><path d="M5 3h5v18H5zM14 3h5v18h-5z"/></svg></span><span class="titel">Symbolik</span><span class="dauer">6:14</span></button></div>
+<p>Symbolik auf jüdischen Grabsteinen Die Symbolik auf jüdischen Grabsteinen ist vielfältig und insbesondere bei den älteren Steinen oft auffälligstes Element der Gestaltung. Auf manchen Friedhöfen in Süddeutschland ist fast jeder Grabstein mit Symbolik und Ornamentik geschmückt.</p>
+<p>Die Symbolik ist in zwei Kategorien zu unterteilen: in jüdische Symbole und solche, die von der Umgebung übernommen wurden. Diese müssen wiederum unterschieden werden von allgemeiner Ornamentik, insbesondere vielfältigen pflanzlichen und floralen Motiven ohne tiefere Bedeutung. Zu den jüdischen Symbolen zählen solche, die auf die Abstammung hinweisen, für ein Ehrenamt in der Gemeinde stehen oder Eigenschaften wie große Gelehrsamkeit und hohes Ansehen hervorheben. Andere symbolisieren den Namen des Verstorbenen oder deuten als allgemein jüdische Symbole auf sein Judentum.</p>
+<figure class="klein"><img src="images/station-09-01-grabstein.png" width="232" height="311" alt="Grabstein" loading="lazy" decoding="async"><figcaption>Grabstein</figcaption></figure>
+<h4>Segnende Hände</h4>
+<p>Zu den häufigsten Symbolen zählen diejenigen, die für die Abstammung von den alten Geschlechtern der Kohanim und der Leviten stehen. Diese waren im Tempel für die Darbringung der Opfer zuständig und sprachen den Segen über das Volk. Bei diesem Segen, der sich bis heute in der Synagoge erhalten hat, erhebt der Kohen die Hände in der charakteristischen Fingerhaltung: Daumen und Zeigefinger berühren sich, während Ring- und kleiner Finger abgespreizt werden. Dieses Symbol findet sich nicht auf dem Braunsbacher Friedhof.</p>
+<figure class="klein"><img src="images/station-09-02-haende.png" width="488" height="350" alt="Segnende Hände" loading="lazy" decoding="async"><figcaption>Segnende Hände</figcaption></figure>
+<h4>Levitenkanne</h4>
+<p>Die LEVITENKANNE weist auf levitische Abkunft. Die Leviten waren im Tempel unter anderem für die kultische Reinheit zuständig und wuschen den Priestern vor dem Opferkult die Hände. Dafür steht auf den Grabsteinen das Symbol der Kanne. Diese findet sich in den verschiedensten Formen, als bauchige Waschkrüge, meist mit Untersatz, oder hohe schlanke Gießgefäße, oft von zeitgenössischen Gieß- und Waschgefäßen beeinflusst. Manchmal eingraviert, meist jedoch plastisch hervortretend, schmücken sie Giebel oder Sockel eines Grabsteins.</p>
+<h4>Schofar</h4>
+<p>Das SCHOFAR (Widderhorn) verweist auf das Ehrenamt des Schofarbläsers.</p>
+<p>Es wird an Neujahr und am Versöhnungstag in der Synagoge geblasen, um die Sünder zur Umkehr zu mahnen. Auf Grabsteinen kann es auch als Sinnbild für die Auferstehung verstanden werden: Am Ende der Tage wird der Messias das Große Schofar blasen, um die Verstorbenen aufzuerwecken.</p>
+<h4>Beschneidungsmesser</h4>
+<p>Der Mohel ist der rituelle Beschneider, der die Beschneidung der jüdischen Knaben am achten Tag nach ihrer Geburt vornimmt. Durch diesen Akt wird der Junge in den Bund mit Gott aufgenommen. Auf einen Mohel, einen Beschneider, deutet die Darstellung eines Beschneidungsmessers, meist in Verbindung mit den bei der Beschneidung verwendeten zwei Kelchen.</p>
+<h4>Buch</h4>
+<p>Ein aufgeschlagenes Buch steht für große Gelehrsamkeit und religiöse Bildung. Oft findet es sich auf Grabsteinen von Vorbetern und Rabbinern.</p>
+<h4>Gesetzestafeln</h4>
+<p>Mitunter findet sich auch die Darstellung der Bundestafeln, auf denen Moses auf dem Berg Sinai die „Zehn Gebote“ empfing. Sie sind ein Symbol für Gesetzestreue, das sich manchmal auch auf Grabsteinen von Männern namens Moses finden lässt. Die miteinanderverbundenen Tafeln zeigen meist die ersten zehn Buchstaben des hebräischen Alphabetes.</p>
+<h4>Akrostichon</h4>
+<p>Beliebt ist das Akrostichon (= Leistenvers oder Leistengedicht).</p>
+<p>Dabei ergeben die Anfangsbuchstaben der Zeilen, senkrecht gelesen, den Namen des Verstorbenen.</p>
+<p>So ergeben z.B. die ersten vier Wörter des Psalms 96,11 ein Akrostichon des Namens Gottes: JHWH.</p>
+<figure class="klein"><img src="images/station-09-03-ichthys.png" width="338" height="342" alt="ICHTHYS (grch. Fisch)= Zeichen für jesus Christus" loading="lazy" decoding="async"><figcaption>ICHTHYS (grch. Fisch)= Zeichen für jesus Christus</figcaption></figure>
+</div>
+<a class="weiter" href="#/Start"><small>Ende des Wegs</small><b>Zurück zur Karte</b><span class="pfeil">Zur Übersicht →</span></a>
 </div>
 
 <div id="Sonstiges" class="tabcontent">
-  <h2>Impressum</h2>
-  <p>RabbinatsMuseumBraunsbach<br><br>
+<header class="hero hero-schlicht"><h2><span class="ttl">Impressum</span></h2></header>
+<div class="seite impressum">
+<p>RabbinatsMuseumBraunsbach</p>
+<p>Kultur im Rabbinat Förderverein e.V.</p>
+<p>BM-Dieter-Hanselmann-Str. 2<br>
+D - 74542 Braunsbach<br>
+Telefon: <a href="tel:+4979068512">+49-7906-8512</a><br>
+Telefax: +49-7906-8559<br>
+E-Mail: <a href="mailto:rabbinatsmuseum@braunsbach.de">rabbinatsmuseum<wbr>@braunsbach.de</a><br>
+Internet: <a href="https://www.rabbinatsgebaeude-braunsbach.de">www.rabbinatsgebaeude-braunsbach.de</a></p>
+<p>Vertretungsberechtigter Vorstand: Elisabeth M. Quirbach (1. Vorsitzende), Werner Zügel<br>
+Registergericht: Schwäbisch Hall<br>
+Registernummer: VR 804</p>
+<figure class="klein"><img src="images/sonstiges-01-impressum.png" width="300" height="225" alt="Vier Personen in einem Ausstellungsraum" loading="lazy" decoding="async"></figure>
+<p>Haftungshinweis: Trotz sorgfältiger inhaltlicher Kontrolle übernehmen wir keine Haftung für die Inhalte externer Links. Für den Inhalt der verlinkten Seiten sind ausschließlich deren Betreiber verantwortlich.</p>
+<h4>Karte und Schriften</h4>
+<p>Kartendaten © OpenStreetMap-Mitwirkende (ODbL). Höhenlinien: Copernicus DEM GLO-90. Schriften: Frank Ruhl Libre und Source Sans 3 (SIL Open Font License).</p>
+</div>
+<a class="weiter" href="#/Start"><small>Kulturweg Braunsbach</small><b>Zurück zur Karte</b><span class="pfeil">Zur Übersicht →</span></a>
+</div>
 
-    Kultur im Rabbinat Förderverein e.V.<br><br>
-    
-    BM-Dieter-Hanselmann-Str. 2<br>
-    D - 74542 Braunsbach<br>
-    Telefon: +49-7906-8512<br>
-    Telefax: +49-7906-8559<br>
-    E-Mail: rabbinatsmuseum<wbr>@braunsbach.de<br>
-    Internet: www.rabbinatsgebaeude-braunsbach.de<br><br>
-    
-    Vertretungsberechtigter Vorstand: Elisabeth M. Quirbach (1. Vorsitzende), Werner Zügel<br>
-    Registergericht: Schwäbisch Hall<br>
-    Registernummer: VR 804<br><br>
 
-    <figure>
-        <img src="images/sonstiges-01-impressum.png">
-    </figure><br>
-    
-    Haftungshinweis: Trotz sorgfältiger inhaltlicher Kontrolle übernehmen wir keine Haftung für die Inhalte externer Links. Für den Inhalt der verlinkten Seiten sind ausschließlich deren Betreiber verantwortlich.</p> 
+<aside id="player" aria-label="Audio">
+  <button id="pPlay" aria-label="Abspielen oder anhalten">
+    <svg class="spiel" viewBox="0 0 24 24"><path d="M6 3l15 9-15 9z"/></svg>
+    <svg class="pause" viewBox="0 0 24 24"><path d="M5 3h5v18H5zM14 3h5v18h-5z"/></svg>
+  </button>
+  <div class="p-mitte">
+    <div id="pTitel"></div>
+    <input id="pSuche" type="range" min="0" max="1000" value="0" aria-label="Position">
+    <div class="p-zeit"><span id="pJetzt">0:00</span><span id="pGesamt">0:00</span></div>
+  </div>
+  <button id="pZurueck" aria-label="15 Sekunden zurück">−15</button>
+  <button id="pZu" aria-label="Audio schließen">✕</button>
+</aside>
+
+<div id="viewer" role="dialog" aria-label="Bild vergrößert">
+  <button id="vZu" aria-label="Schließen">✕</button>
+  <img id="vBild" alt="">
+  <div id="vText"></div>
 </div>
 
 <script>
-window.onscroll = function() {myFunction()};
+var pages = document.getElementsByClassName("tabcontent");
+var tablinks = document.getElementsByClassName("tablink");
+var fortschritt = document.getElementById("fortschritt");
+var startScroll = 0;
+var seite = null;
 
-var navbar = document.getElementById("navbar");
-var sticky = navbar.offsetTop;
+// Small saved preferences. Storage can be blocked, so nothing may depend on it.
+function lies(key, fallback) {
+  try { return JSON.parse(localStorage.getItem(key)) || fallback; } catch (e) { return fallback; }
+}
 
-function myFunction() {
-  if (window.pageYOffset >= sticky) {
-    navbar.classList.add("sticky")
+function schreib(key, value) {
+  try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
+}
+
+var gesehen = lies("kw-gesehen", {});
+var schrift = lies("kw-schrift", 0);
+var SCHRIFTEN = [1, 1.14, 1.3];
+
+function zeigeSchrift() {
+  document.documentElement.style.setProperty("--schrift", SCHRIFTEN[schrift]);
+}
+
+function zeigeGesehen() {
+  var els = document.querySelectorAll("[data-seite]");
+  for (var i = 0; i < els.length; i++) {
+    els[i].classList.toggle("gesehen", !!gesehen[els[i].getAttribute("data-seite")]);
+  }
+}
+
+function openPage(pageName) {
+  var neu = document.getElementById(pageName);
+  if (!neu || !neu.classList.contains("tabcontent")) { pageName = "Start"; neu = document.getElementById("Start"); }
+  if (seite === "Start") { startScroll = window.pageYOffset; }
+
+  for (var i = 0; i < pages.length; i++) { pages[i].classList.remove("offen"); }
+  for (var j = 0; j < tablinks.length; j++) {
+    tablinks[j].classList.toggle("active", tablinks[j].getAttribute("data-seite") === pageName);
+  }
+  neu.classList.add("offen");
+  document.body.classList.toggle("in-station", pageName !== "Start");
+  seite = pageName;
+
+  if (/^Station/.test(pageName)) {
+    gesehen[pageName] = 1;
+    schreib("kw-gesehen", gesehen);
+  }
+  zeigeGesehen();
+  window.scrollTo(0, pageName === "Start" ? startScroll : 0);
+  zeigeFortschritt();
+}
+
+function route() {
+  var treffer = location.hash.match(/^#\/(\w+)/);
+  openPage(treffer ? treffer[1] : "Start");
+}
+
+function zeigeFortschritt() {
+  var max = document.documentElement.scrollHeight - window.innerHeight;
+  fortschritt.style.transform = "scaleX(" + (max > 0 ? Math.min(1, window.pageYOffset / max) : 0) + ")";
+}
+
+window.addEventListener("hashchange", route);
+window.addEventListener("scroll", zeigeFortschritt, { passive: true });
+
+// Audio: one shared player, so it keeps running while you walk and read on
+
+var audio = new Audio();
+var player = document.getElementById("player");
+var suche = document.getElementById("pSuche");
+var aktuell = null;
+var ziehen = false;
+
+function zeit(s) {
+  s = Math.max(0, Math.floor(s || 0));
+  return Math.floor(s / 60) + ":" + ("0" + (s % 60)).slice(-2);
+}
+
+function zeigeAudio() {
+  var laeuft = !audio.paused && !audio.ended;
+  player.classList.toggle("laeuft", laeuft);
+  if (aktuell) { aktuell.classList.toggle("laeuft", laeuft); }
+}
+
+function waehleTrack(track) {
+  if (aktuell === track) {
+    if (audio.paused) { audio.play(); } else { audio.pause(); }
+    return;
+  }
+  if (aktuell) {
+    aktuell.classList.remove("an", "laeuft");
+    aktuell.style.removeProperty("--p");
+  }
+  aktuell = track;
+  track.classList.add("an");
+  audio.src = track.getAttribute("data-src");
+  document.getElementById("pTitel").textContent = track.querySelector(".titel").textContent;
+  document.getElementById("pGesamt").textContent = track.querySelector(".dauer").textContent;
+  document.body.classList.add("mit-player");
+  audio.play();
+}
+
+function schliesseAudio() {
+  audio.pause();
+  if (aktuell) {
+    aktuell.classList.remove("an", "laeuft");
+    aktuell.style.removeProperty("--p");
+  }
+  aktuell = null;
+  audio.removeAttribute("src");
+  document.body.classList.remove("mit-player");
+}
+
+audio.addEventListener("play", zeigeAudio);
+audio.addEventListener("pause", zeigeAudio);
+audio.addEventListener("ended", zeigeAudio);
+audio.addEventListener("error", function() {
+  if (aktuell) { document.getElementById("pTitel").textContent = "Audio konnte nicht geladen werden"; }
+});
+audio.addEventListener("timeupdate", function() {
+  if (!aktuell || !audio.duration) { return; }
+  var anteil = audio.currentTime / audio.duration;
+  aktuell.style.setProperty("--p", anteil);
+  document.getElementById("pJetzt").textContent = zeit(audio.currentTime);
+  if (!ziehen) { suche.value = anteil * 1000; }
+});
+
+document.getElementById("pPlay").addEventListener("click", function() {
+  if (audio.paused) { audio.play(); } else { audio.pause(); }
+});
+document.getElementById("pZurueck").addEventListener("click", function() {
+  audio.currentTime = Math.max(0, audio.currentTime - 15);
+});
+document.getElementById("pZu").addEventListener("click", schliesseAudio);
+suche.addEventListener("input", function() { ziehen = true; });
+suche.addEventListener("change", function() {
+  ziehen = false;
+  if (audio.duration) { audio.currentTime = suche.value / 1000 * audio.duration; }
+});
+
+// Image viewer with pinch zoom. Old signs and handwriting need it to be readable.
+
+var viewer = document.getElementById("viewer");
+var vBild = document.getElementById("vBild");
+var ansicht = { z: 1, x: 0, y: 0 };
+var finger = {};
+var geste = null;
+var letzterTipp = 0;
+
+function zeigeAnsicht() {
+  vBild.style.transform = "translate(calc(-50% + " + ansicht.x + "px), calc(-50% + " + ansicht.y + "px)) scale(" + ansicht.z + ")";
+}
+
+function setzeZoom(z) {
+  ansicht.z = Math.min(6, Math.max(1, z));
+  if (ansicht.z === 1) { ansicht.x = 0; ansicht.y = 0; }
+  zeigeAnsicht();
+}
+
+function oeffneBild(img) {
+  var figure = img.closest("figure");
+  var text = figure && figure.querySelector("figcaption");
+  vBild.src = img.getAttribute("src");
+  vBild.alt = img.alt;
+  document.getElementById("vText").textContent = text ? text.textContent : "";
+  ansicht = { z: 1, x: 0, y: 0 };
+  zeigeAnsicht();
+  viewer.classList.add("offen");
+  history.pushState({ bild: 1 }, "");
+}
+
+function fingerListe() {
+  return Object.keys(finger).map(function(id) { return finger[id]; });
+}
+
+function abstand(a, b) {
+  return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
+}
+
+viewer.addEventListener("pointerdown", function(e) {
+  if (e.target.id === "vZu") { return; }
+  viewer.setPointerCapture(e.pointerId);
+  finger[e.pointerId] = { x: e.clientX, y: e.clientY };
+  var f = fingerListe();
+  geste = f.length === 2
+    ? { d: abstand(f[0], f[1]), z: ansicht.z }
+    : { x: e.clientX, y: e.clientY, ax: ansicht.x, ay: ansicht.y };
+  var jetzt = Date.now();
+  if (f.length === 1 && jetzt - letzterTipp < 300) { setzeZoom(ansicht.z > 1 ? 1 : 2.6); }
+  letzterTipp = jetzt;
+});
+
+viewer.addEventListener("pointermove", function(e) {
+  if (!finger[e.pointerId] || !geste) { return; }
+  finger[e.pointerId] = { x: e.clientX, y: e.clientY };
+  var f = fingerListe();
+  if (f.length === 2 && geste.d) {
+    setzeZoom(geste.z * abstand(f[0], f[1]) / geste.d);
+  } else if (f.length === 1 && ansicht.z > 1 && geste.x !== undefined) {
+    ansicht.x = geste.ax + e.clientX - geste.x;
+    ansicht.y = geste.ay + e.clientY - geste.y;
+    zeigeAnsicht();
+  }
+});
+
+function fingerWeg(e) {
+  delete finger[e.pointerId];
+  var f = fingerListe();
+  geste = f.length === 1 ? { x: f[0].x, y: f[0].y, ax: ansicht.x, ay: ansicht.y } : null;
+}
+
+viewer.addEventListener("pointerup", fingerWeg);
+viewer.addEventListener("pointercancel", fingerWeg);
+viewer.addEventListener("wheel", function(e) {
+  e.preventDefault();
+  setzeZoom(ansicht.z * (e.deltaY < 0 ? 1.15 : .87));
+}, { passive: false });
+
+document.getElementById("vZu").addEventListener("click", function() { history.back(); });
+
+// The Android back button closes the viewer before it leaves the page
+window.addEventListener("popstate", function() { viewer.classList.remove("offen"); });
+document.addEventListener("keydown", function(e) {
+  if (e.key === "Escape" && viewer.classList.contains("offen")) { history.back(); }
+});
+
+// One listener for all tracks, images, jump links and text size buttons
+document.addEventListener("click", function(e) {
+  var ziel = e.target.closest ? e.target.closest(".track, .seite img, .tafel, [data-sprung], .aa") : null;
+  if (!ziel) { return; }
+  if (ziel.classList.contains("track")) {
+    waehleTrack(ziel);
+  } else if (ziel.classList.contains("tafel")) {
+    oeffneBild(ziel.querySelector("img"));
+  } else if (ziel.classList.contains("aa")) {
+    schrift = (schrift + 1) % SCHRIFTEN.length;
+    schreib("kw-schrift", schrift);
+    zeigeSchrift();
+  } else if (ziel.hasAttribute("data-sprung")) {
+    document.getElementById(ziel.getAttribute("data-sprung")).scrollIntoView({ behavior: "smooth" });
   } else {
-    navbar.classList.remove("sticky");
+    oeffneBild(ziel);
   }
-}
+});
 
-function openPage(pageName,elmnt,color) {
-  window.scrollTo(0,0); 
-  var i, tabcontent, tablinks;
-  tabcontent = document.getElementsByClassName("tabcontent");
-  for (i = 0; i < tabcontent.length; i++) {
-    tabcontent[i].style.display = "none";
-  }
-  tablinks = document.getElementsByClassName("tablink");
-  for (i = 0; i < tablinks.length; i++) {
-    tablinks[i].style.backgroundColor = "";
-  }
-  document.getElementById(pageName).style.display = "block";
-  elmnt.style.backgroundColor = color;
-}
-document.getElementById("defaultOpen").click();
+zeigeSchrift();
+route();
 </script>
 
 </body>

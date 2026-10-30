@@ -1,5 +1,11 @@
 {
   "appId": "com.jkwb.app",
   "appName": "JKW Braunsbach",
-  "webDir": "www"
+  "webDir": "www",
+  "backgroundColor": "#141b22",
+  "plugins": {
+    "SystemBars": {
+      "style": "DARK"
+    }
+  }
 }
