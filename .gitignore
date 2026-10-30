@@ -7,3 +7,6 @@ key.properties
 
 # Local Android SDK path
 local.properties
+
+# Local copy of the old website sources
+_reference/
