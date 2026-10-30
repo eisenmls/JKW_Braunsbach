@@ -86,6 +86,29 @@ Java 25 is only used to run the build. The app's code still compiles at Java 21 
 
 When Capacitor 9 is stable, upgrade with `npx cap migrate`.
 
+## Building for Google Play
+
+The app is an update to the live listing `app.kulturweg.braunsbach`, so it must be signed with the existing upload key.
+
+1. Put the upload key on this computer, outside any folder that git tracks.
+2. Create `android/key.properties`:
+
+   ```properties
+   storeFile=C:/path/to/AppKey.jks
+   storePassword=YOUR_PASSWORD
+   keyAlias=key0
+   keyPassword=YOUR_PASSWORD
+   ```
+
+3. Raise `versionCode` in `android/app/build.gradle`. Every upload needs a higher number.
+4. Run `npm.cmd run aab`.
+
+The app bundle ends up at:
+
+```
+android\app\build\outputs\bundle\release\app-release.aab
+```
+
 ## Signing keys
 
 Never commit a signing key. `.gitignore` blocks `*.jks`, `*.keystore` and `key.properties`.

@@ -1,4 +1,4 @@
-package com.jkwb.app;
+package app.kulturweg.braunsbach;
 
 import com.getcapacitor.BridgeActivity;
 
