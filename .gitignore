@@ -1,0 +1,9 @@
+node_modules/
+
+# Signing keys never go into the repo
+*.jks
+*.keystore
+key.properties
+
+# Local Android SDK path
+local.properties
